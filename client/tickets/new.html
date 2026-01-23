@@ -221,6 +221,7 @@
     <script src="../../js/services/tickets.service.js"></script>
     <script src="../../js/services/comments.service.js"></script>
     <script src="../../js/services/invitations.service.js"></script>
+    <script src="../../js/services/email.service.js"></script>
     <script src="../../js/components/ui.components.js"></script>
     <script src="../../js/components/auth-guard.js"></script>
     <script>
@@ -521,6 +522,57 @@
             };
         }
 
+        // Notify support team about new ticket
+        async function notifySupportTeam(ticketId, ticketData) {
+            try {
+                const client = AudazSupabase.getClient();
+                if (!client) return;
+
+                // Get support team emails
+                const { data: supportUsers, error } = await client
+                    .from('profiles')
+                    .select('id')
+                    .in('role', ['support_agent', 'support_admin']);
+
+                if (error || !supportUsers || supportUsers.length === 0) {
+                    console.warn('No support users found for notification');
+                    return;
+                }
+
+                // Get emails from auth.users via RPC or direct query
+                const supportIds = supportUsers.map(u => u.id);
+
+                // Get organization name
+                let orgName = 'Unknown Organization';
+                if (currentProfile?.org_id) {
+                    const { data: org } = await client
+                        .from('organizations')
+                        .select('name')
+                        .eq('id', currentProfile.org_id)
+                        .single();
+                    if (org) orgName = org.name;
+                }
+
+                // For now, we'll use a simplified approach - call the edge function
+                // The edge function can fetch the emails internally
+                await EmailService.sendTicketNotification({
+                    type: 'ticket_created',
+                    to: ['support@audazpro.com'], // Fallback - ideally get from DB
+                    ticketId: ticketId,
+                    ticketTitle: ticketData.title,
+                    ticketType: ticketData.type,
+                    orgName: orgName,
+                    ticketUrl: `${window.location.origin}/support/tickets/detail.html?id=${ticketId}`,
+                    createdBy: currentProfile?.full_name || 'Unknown User'
+                });
+
+                console.log('Support team notified about new ticket');
+            } catch (err) {
+                console.error('Failed to notify support team:', err);
+                // Don't show error to user - notification is non-critical
+            }
+        }
+
         async function handleSubmit(e) {
             e.preventDefault();
             const form = e.target;
@@ -599,6 +651,9 @@
                         uploadErrorMessage = `Upload error: ${uploadError.message}`;
                     }
                 }
+
+                // Send email notification to support team (async, don't wait)
+                notifySupportTeam(result.ticketId, ticketData);
 
                 // Show appropriate message and redirect
                 if (uploadErrorMessage) {

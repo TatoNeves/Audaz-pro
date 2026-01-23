@@ -198,6 +198,7 @@
     <script src="../../js/services/comments.service.js"></script>
     <script src="../../js/services/invitations.service.js"></script>
     <script src="../../js/services/collaborators.service.js"></script>
+    <script src="../../js/services/email.service.js"></script>
     <script src="../../js/components/ui.components.js"></script>
     <script src="../../js/components/auth-guard.js"></script>
     <script>
@@ -582,10 +583,15 @@
 
                 UIComponents.setButtonLoading(btn, true);
 
+                const oldStatus = currentTicket.status;
                 const result = await TicketsService.updateStatus(currentTicket.id, status);
 
                 if (result.success) {
                     UIComponents.showSuccess('Status updated!');
+
+                    // Notify client about status change (async)
+                    notifyStatusChange(oldStatus, status);
+
                     await loadTicket(currentTicket.id);
                     await loadTimeline(currentTicket.id);
                 } else {
@@ -745,11 +751,81 @@
                 await loadComments(currentTicket.id);
                 await loadCollaborators(currentTicket.id); // Reload collaborators (mentions may add new ones)
                 await loadTimeline(currentTicket.id);
+
+                // Notify ticket creator about new comment from support (async)
+                notifyClientAboutComment(finalBody);
             } else {
                 UIComponents.showError(result.error);
             }
 
             UIComponents.setButtonLoading(btn, false);
+        }
+
+        // Notify ticket creator about status change
+        async function notifyStatusChange(oldStatus, newStatus) {
+            try {
+                if (!currentTicket) return;
+
+                const creatorEmail = currentTicket.created_by_email || null;
+                const orgName = currentTicket.org_name || 'Your Organization';
+
+                if (creatorEmail) {
+                    await EmailService.sendTicketNotification({
+                        type: 'ticket_status_changed',
+                        to: [creatorEmail],
+                        ticketId: currentTicket.id,
+                        ticketTitle: currentTicket.title,
+                        orgName: orgName,
+                        ticketUrl: `${window.location.origin}/client/tickets/detail.html?id=${currentTicket.id}`,
+                        oldStatus: oldStatus,
+                        newStatus: newStatus
+                    });
+                    console.log('Client notified about status change');
+                }
+            } catch (err) {
+                console.error('Failed to notify about status change:', err);
+            }
+        }
+
+        // Notify ticket creator about comment from support
+        async function notifyClientAboutComment(commentBody) {
+            try {
+                if (!currentTicket || !currentTicket.created_by) return;
+
+                const client = AudazSupabase.getClient();
+
+                // Get ticket creator's email
+                const { data: creatorProfile } = await client
+                    .from('profiles')
+                    .select('id, full_name')
+                    .eq('id', currentTicket.created_by)
+                    .single();
+
+                if (!creatorProfile) return;
+
+                // Get email from auth.users (we need RPC for this)
+                // For now use a placeholder - you'd need to get this from the ticket data or a join
+                const creatorEmail = currentTicket.created_by_email || null;
+
+                // Get organization name
+                let orgName = currentTicket.org_name || 'Your Organization';
+
+                if (creatorEmail) {
+                    await EmailService.sendTicketNotification({
+                        type: 'ticket_comment',
+                        to: [creatorEmail],
+                        ticketId: currentTicket.id,
+                        ticketTitle: currentTicket.title,
+                        orgName: orgName,
+                        ticketUrl: `${window.location.origin}/client/tickets/detail.html?id=${currentTicket.id}`,
+                        commentBy: currentProfile?.full_name || 'Support Team',
+                        commentPreview: commentBody.substring(0, 200)
+                    });
+                    console.log('Client notified about support comment');
+                }
+            } catch (err) {
+                console.error('Failed to notify client about comment:', err);
+            }
         }
 
         function setupCommentComposer(profile) {

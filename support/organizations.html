@@ -298,6 +298,7 @@
     <script src="../js/services/tickets.service.js"></script>
     <script src="../js/services/comments.service.js"></script>
     <script src="../js/services/invitations.service.js"></script>
+    <script src="../js/services/email.service.js"></script>
     <script src="../js/components/ui.components.js"></script>
     <script src="../js/components/auth-guard.js"></script>
     <script>
@@ -864,9 +865,25 @@
                     return;
                 }
 
-                // Show success with invite link
+                // Build invite URL
                 const inviteUrl = `${window.location.origin}/invite/index.html?token=${data.token}`;
-                UIComponents.showSuccess(`Invitation sent to ${email}`);
+
+                // Send email via Edge Function
+                const emailResult = await EmailService.sendInviteEmail({
+                    to: email,
+                    inviteUrl: inviteUrl,
+                    orgName: data.org_name,
+                    role: role,
+                    expiresAt: data.expires_at
+                });
+
+                if (emailResult.success) {
+                    UIComponents.showSuccess(`Convite enviado para ${email}`);
+                } else {
+                    // Invitation created but email failed - show warning with copy option
+                    console.warn('Email send failed:', emailResult.error);
+                    UIComponents.showSuccess(`Convite criado! Email não enviado. Copie o link: ${inviteUrl}`);
+                }
 
                 // Clear email field and reload invitations
                 document.getElementById('invite-email').value = '';

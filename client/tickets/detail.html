@@ -210,6 +210,7 @@
     <script src="../../js/services/comments.service.js"></script>
     <script src="../../js/services/invitations.service.js"></script>
     <script src="../../js/services/collaborators.service.js"></script>
+    <script src="../../js/services/email.service.js"></script>
     <script src="../../js/components/ui.components.js"></script>
     <script src="../../js/components/auth-guard.js"></script>
     <script>
@@ -708,6 +709,40 @@
             return { attachments: uploadedUrls, failedUploads };
         }
 
+        // Notify support about new comment from client
+        async function notifyCommentAdded(commentBody) {
+            try {
+                if (!currentTicket) return;
+
+                // Get organization name
+                const client = AudazSupabase.getClient();
+                let orgName = 'Unknown Organization';
+                if (currentTicket.org_id) {
+                    const { data: org } = await client
+                        .from('organizations')
+                        .select('name')
+                        .eq('id', currentTicket.org_id)
+                        .single();
+                    if (org) orgName = org.name;
+                }
+
+                await EmailService.sendTicketNotification({
+                    type: 'ticket_comment',
+                    to: ['support@audazpro.com'], // Support team email
+                    ticketId: currentTicket.id,
+                    ticketTitle: currentTicket.title,
+                    orgName: orgName,
+                    ticketUrl: `${window.location.origin}/support/tickets/detail.html?id=${currentTicket.id}`,
+                    commentBy: currentProfile?.full_name || 'Client',
+                    commentPreview: commentBody.substring(0, 200)
+                });
+
+                console.log('Support notified about new comment');
+            } catch (err) {
+                console.error('Failed to notify about comment:', err);
+            }
+        }
+
         async function handleCommentSubmit(e) {
             e.preventDefault();
             const form = e.target;
@@ -767,6 +802,9 @@
                 await loadComments(currentTicket.id);
                 await loadCollaborators(currentTicket.id); // Reload collaborators (mentions may add new ones)
                 await loadTimeline(currentTicket.id);
+
+                // Send email notification to support (async, don't block)
+                notifyCommentAdded(finalBody);
             } else {
                 UIComponents.showError(result.error);
             }
