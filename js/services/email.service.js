@@ -5,59 +5,37 @@
  */
 
 const EmailService = {
-    // Supabase Edge Function URLs
-    FUNCTIONS_URL: null,
-
-    // Initialize with Supabase project URL
-    init() {
-        const client = AudazSupabase.getClient();
-        if (client) {
-            // Get the Supabase URL from the client
-            const supabaseUrl = client.supabaseUrl || 'https://jliqlisrnuusqxiswfcg.supabase.co';
-            this.FUNCTIONS_URL = `${supabaseUrl}/functions/v1`;
-        }
-    },
-
-    // Get auth headers for Edge Functions
-    async getHeaders() {
-        const client = AudazSupabase.getClient();
-        if (!client) return {};
-
-        const { data: { session } } = await client.auth.getSession();
-        return {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session?.access_token || ''}`,
-        };
-    },
-
     // ============================================
     // SEND INVITE EMAIL
     // ============================================
     async sendInviteEmail({ to, inviteUrl, orgName, role, expiresAt }) {
-        if (!this.FUNCTIONS_URL) this.init();
+        const client = AudazSupabase.getClient();
+        if (!client) {
+            return { success: false, error: 'Supabase not configured' };
+        }
 
         try {
-            const headers = await this.getHeaders();
-            const response = await fetch(`${this.FUNCTIONS_URL}/send-invite-email`, {
-                method: 'POST',
-                headers,
-                body: JSON.stringify({
+            const { data, error } = await client.functions.invoke('send-invite-email', {
+                body: {
                     to,
                     inviteUrl,
                     orgName,
                     role,
                     expiresAt
-                })
+                }
             });
 
-            const data = await response.json();
+            if (error) {
+                console.error('Send invite email error:', error);
+                return { success: false, error: error.message || 'Failed to send email' };
+            }
 
-            if (!response.ok) {
-                console.error('Send invite email error:', data);
+            if (data && !data.success) {
+                console.error('Send invite email error:', data.error);
                 return { success: false, error: data.error || 'Failed to send email' };
             }
 
-            return { success: true, messageId: data.messageId };
+            return { success: true, messageId: data?.messageId };
         } catch (error) {
             console.error('Send invite email error:', error);
             return { success: false, error: error.message };
@@ -86,14 +64,14 @@ const EmailService = {
         oldPriority,
         newPriority
     }) {
-        if (!this.FUNCTIONS_URL) this.init();
+        const client = AudazSupabase.getClient();
+        if (!client) {
+            return { success: false, error: 'Supabase not configured' };
+        }
 
         try {
-            const headers = await this.getHeaders();
-            const response = await fetch(`${this.FUNCTIONS_URL}/ticket-notification`, {
-                method: 'POST',
-                headers,
-                body: JSON.stringify({
+            const { data, error } = await client.functions.invoke('ticket-notification', {
+                body: {
                     type,
                     to: Array.isArray(to) ? to : [to],
                     ticketId,
@@ -110,17 +88,20 @@ const EmailService = {
                     commentPreview,
                     oldPriority,
                     newPriority
-                })
+                }
             });
 
-            const data = await response.json();
+            if (error) {
+                console.error('Send ticket notification error:', error);
+                return { success: false, error: error.message || 'Failed to send notification' };
+            }
 
-            if (!response.ok) {
-                console.error('Send ticket notification error:', data);
+            if (data && !data.success) {
+                console.error('Send ticket notification error:', data.error);
                 return { success: false, error: data.error || 'Failed to send notification' };
             }
 
-            return { success: true, messageId: data.messageId };
+            return { success: true, messageId: data?.messageId };
         } catch (error) {
             console.error('Send ticket notification error:', error);
             return { success: false, error: error.message };
