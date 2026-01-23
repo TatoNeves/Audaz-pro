@@ -27,18 +27,20 @@ supabase secrets set RESEND_API_KEY=re_EF9Zt1s9_P7BDhB6pofK2wVGAMZCJ3wnM
 
 ## Deploy Functions
 
-Deploy all functions:
+**IMPORTANT**: Use `--no-verify-jwt` flag to allow public access (required for client-side calls):
 
 ```bash
-supabase functions deploy send-invite-email
-supabase functions deploy ticket-notification
+supabase functions deploy send-invite-email --no-verify-jwt
+supabase functions deploy ticket-notification --no-verify-jwt
 ```
 
 Or deploy all at once:
 
 ```bash
-supabase functions deploy
+supabase functions deploy --no-verify-jwt
 ```
+
+> Note: The `--no-verify-jwt` flag is required because these functions are called from the browser using the Supabase client. Without this flag, you'll get 401 Unauthorized errors.
 
 ## Configure Resend Domain
 
