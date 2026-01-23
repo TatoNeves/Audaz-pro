@@ -1,0 +1,40 @@
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Claude Code
+.claude/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Debug and test files
+test-*.html
+*-debug.html
+
+# Documentation (optional - remove if you want these in repo)
+# README.md
+# *.md
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Backup files
+*.bak
+*.backup
+
+# Temporary files
+*.tmp
+*.temp
+
+# Work/backup folder with design files
+{css,js,images}/

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Audaz Pro</title>
+    <meta name="description" content="Access your Audaz Pro account to manage tickets and support.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/tickets.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../images/favicon-32x32.png">
+</head>
+<body class="audaz-body">
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container">
+            <div class="header-grid">
+                <a href="/" class="logo-link">
+                    <img src="../images/66943b1c1348ffa2b811c19c_Audaz Black.png" alt="Audaz Pro" class="logo-image">
+                </a>
+                <nav class="nav">
+                    <ul class="nav-menu">
+                        <li><a href="/" class="nav-link">Home</a></li>
+                        <li><a href="/contact.html" class="nav-link">Contact</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Auth Section -->
+        <section class="auth-section">
+            <div class="container">
+                <div class="auth-container">
+                    <!-- Tab Navigation -->
+                    <div class="auth-tabs">
+                        <button class="auth-tab active" data-tab="login">Sign In</button>
+                        <button class="auth-tab" data-tab="signup">Sign Up</button>
+                    </div>
+
+                    <!-- Login Form -->
+                    <div class="auth-panel active" id="login-panel">
+                        <div class="auth-header">
+                            <h1>Welcome back</h1>
+                            <p>Sign in with your credentials to access your account</p>
+                        </div>
+
+                        <form id="login-form" class="auth-form">
+                            <div class="form-group">
+                                <label for="login-email">Email</label>
+                                <input type="email" id="login-email" name="email" required placeholder="seu@email.com">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="login-password">Password</label>
+                                <input type="password" id="login-password" name="password" required placeholder="Your password" minlength="6">
+                            </div>
+
+                            <div class="form-group form-actions-row">
+                                <a href="#" class="forgot-password-link" id="forgot-password-link">Forgot your password?</a>
+                            </div>
+
+                            <div class="form-submit">
+                                <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+                            </div>
+                        </form>
+
+                        <div class="auth-footer">
+                            <p>Don't have an account? <button class="link-btn" data-tab="signup">Sign Up</button></p>
+                        </div>
+                    </div>
+
+                    <!-- Signup Form -->
+                    <div class="auth-panel" id="signup-panel">
+                        <div class="auth-header">
+                            <h1>Create Account</h1>
+                            <p>Sign up to open tickets and receive support</p>
+                        </div>
+
+                        <form id="signup-form" class="auth-form">
+                            <div class="form-group">
+                                <label for="signup-name">Full Name</label>
+                                <input type="text" id="signup-name" name="full_name" required placeholder="Your full name">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="signup-org">Company Name</label>
+                                <input type="text" id="signup-org" name="organization" required placeholder="Your company name">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="signup-email">Email</label>
+                                <input type="email" id="signup-email" name="email" required placeholder="you@email.com">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="signup-password">Password</label>
+                                <input type="password" id="signup-password" name="password" required placeholder="Minimum 6 characters" minlength="6">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="signup-password-confirm">Confirm Password</label>
+                                <input type="password" id="signup-password-confirm" name="password_confirm" required placeholder="Confirm your password" minlength="6">
+                            </div>
+
+                            <div class="form-submit">
+                                <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+                            </div>
+                        </form>
+
+                        <div class="auth-footer">
+                            <p>Already have an account? <button class="link-btn" data-tab="login">Sign In</button></p>
+                        </div>
+                    </div>
+
+                    <!-- Forgot Password Form -->
+                    <div class="auth-panel" id="forgot-panel">
+                        <div class="auth-header">
+                            <h1>Reset Password</h1>
+                            <p>Enter your email to receive the reset link</p>
+                        </div>
+
+                        <form id="forgot-form" class="auth-form">
+                            <div class="form-group">
+                                <label for="forgot-email">Email</label>
+                                <input type="email" id="forgot-email" name="email" required placeholder="seu@email.com">
+                            </div>
+
+                            <div class="form-submit">
+                                <button type="submit" class="btn btn-primary btn-full">Send Link</button>
+                            </div>
+                        </form>
+
+                        <div class="auth-footer">
+                            <p><button class="link-btn" data-tab="login">Back to Sign In</button></p>
+                        </div>
+                    </div>
+
+                    <!-- Email Confirmation Message -->
+                    <div class="auth-panel" id="confirm-panel">
+                        <div class="auth-header">
+                            <div class="auth-icon success">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                    <polyline points="22 4 12 14.01 9 11.01"/>
+                                </svg>
+                            </div>
+                            <h1>Check your email</h1>
+                            <p>We sent a confirmation link to <strong id="confirm-email"></strong>. Click it to activate your account.</p>
+                        </div>
+
+                        <div class="auth-footer">
+                            <p><button class="link-btn" data-tab="login">Back to Sign In</button></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-divider"></div>
+            <div class="footer-bottom">
+                <img src="../images/66943b1c1348ffa2b811c19c_Audaz Black.png" alt="Audaz Pro" class="footer-logo-img">
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase-config.js"></script>
+    <script src="../js/services/auth.service.js"></script>
+    <script src="../js/services/invitations.service.js"></script>
+    <script src="../js/components/ui.components.js"></script>
+    <script src="../js/components/auth-guard.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Check if already authenticated
+            const isAuth = await AuthGuard.isAuthenticated();
+            if (isAuth) {
+                const profile = await AuthGuard.getProfile();
+                if (profile) {
+                    if (AuthService.isSupport(profile)) {
+                        window.location.href = '/support/dashboard.html';
+                    } else {
+                        window.location.href = '/client/dashboard.html';
+                    }
+                    return;
+                }
+            }
+
+            // Tab switching
+            const tabs = document.querySelectorAll('[data-tab]');
+            const panels = document.querySelectorAll('.auth-panel');
+
+            function switchTab(tabName) {
+                tabs.forEach(t => t.classList.remove('active'));
+                panels.forEach(p => p.classList.remove('active'));
+
+                const activeTab = document.querySelector(`.auth-tab[data-tab="${tabName}"]`);
+                const activePanel = document.getElementById(`${tabName}-panel`);
+
+                if (activeTab) activeTab.classList.add('active');
+                if (activePanel) activePanel.classList.add('active');
+            }
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    switchTab(tab.dataset.tab);
+                });
+            });
+
+            // Forgot password link
+            document.getElementById('forgot-password-link').addEventListener('click', (e) => {
+                e.preventDefault();
+                switchTab('forgot');
+            });
+
+            // Login form
+            document.getElementById('login-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = e.target.querySelector('button[type="submit"]');
+                UIComponents.setButtonLoading(btn, true);
+
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+
+                const result = await AuthService.signIn(email, password);
+
+                if (result.success) {
+                    const profile = await AuthGuard.getProfile();
+                    if (profile && AuthService.isSupport(profile)) {
+                        window.location.href = '/support/dashboard.html';
+                    } else {
+                        window.location.href = '/client/dashboard.html';
+                    }
+                } else {
+                    UIComponents.showError(result.error);
+                    UIComponents.setButtonLoading(btn, false);
+                }
+            });
+
+            // Signup form
+            document.getElementById('signup-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = e.target.querySelector('button[type="submit"]');
+
+                const name = document.getElementById('signup-name').value;
+                const org = document.getElementById('signup-org').value;
+                const email = document.getElementById('signup-email').value;
+                const password = document.getElementById('signup-password').value;
+                const passwordConfirm = document.getElementById('signup-password-confirm').value;
+
+                if (password !== passwordConfirm) {
+                    UIComponents.showError('Passwords do not match');
+                    return;
+                }
+
+                UIComponents.setButtonLoading(btn, true);
+
+                const result = await AuthService.signUp(email, password, name, org);
+
+                if (result.success) {
+                    if (result.needsEmailConfirmation) {
+                        document.getElementById('confirm-email').textContent = email;
+                        switchTab('confirm');
+                    } else {
+                        window.location.href = '/client/dashboard.html';
+                    }
+                } else {
+                    UIComponents.showError(result.error);
+                    UIComponents.setButtonLoading(btn, false);
+                }
+            });
+
+            // Forgot password form
+            document.getElementById('forgot-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = e.target.querySelector('button[type="submit"]');
+                UIComponents.setButtonLoading(btn, true);
+
+                const email = document.getElementById('forgot-email').value;
+                const result = await AuthService.sendPasswordReset(email);
+
+                if (result.success) {
+                    UIComponents.showSuccess('Password reset link sent! Check your email.');
+                    switchTab('login');
+                } else {
+                    UIComponents.showError(result.error);
+                }
+
+                UIComponents.setButtonLoading(btn, false);
+            });
+        });
+    </script>
+</body>
+</html>

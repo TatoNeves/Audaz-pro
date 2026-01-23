@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Contact Audaz Pro - Let's work together on your Webflow project.">
+  <title>Contact Us | Audaz Pro</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://audazpro.com/contact">
+  <meta property="og:title" content="Contact Us | Audaz Pro">
+  <meta property="og:description" content="Contact Audaz Pro - Let's work together on your Webflow project.">
+  <meta property="og:image" content="https://audazpro.com/images/og-image.png">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://audazpro.com/contact">
+  <meta name="twitter:title" content="Contact Us | Audaz Pro">
+  <meta name="twitter:description" content="Contact Audaz Pro - Let's work together on your Webflow project.">
+  <meta name="twitter:image" content="https://audazpro.com/images/og-image.png">
+
+  <!-- Additional SEO -->
+  <meta name="theme-color" content="#000000">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://audazpro.com/contact">
+</head>
+<body class="audaz-body">
+  <header class="site-header">
+    <div class="container header-grid">
+      <a class="audaz-link logo-link" href="index.html" aria-label="Audaz Pro">
+        <img class="logo-image" src="https://cdn.prod.website-files.com/66943a76af8106de4c764ba1/66943b1c1348ffa2b811c19c_Audaz%20Black.png" alt="Audaz Pro logo">
+        <span class="visually-hidden">Audaz Pro</span>
+      </a>
+      <nav class="nav">
+        <ul class="nav-menu">
+          <li><a href="services.html" class="audaz-link nav-link">Webflow Services</a></li>
+          <li><a href="retainers.html" class="audaz-link nav-link">Retainers</a></li>
+          <li><a href="portfolio.html" class="audaz-link nav-link">Portfolio</a></li>
+        </ul>
+        <a href="contact.html" class="audaz-link btn btn-accent">Contact</a>
+      </nav>
+      <button class="mobile-toggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+  
+  <!-- Page Header -->
+  <section class="page-header">
+    <div class="container">
+      <p class="subtitle">CONTACT US</p>
+      <h1>Let's work together</h1>
+      <p>We're experts in developing professional Webflow Websites for businesses worldwide. We don't have a specific industry niche, our niche is the Webflow platform.</p>
+    </div>
+  </section>
+  
+  <!-- Contact Form Section -->
+  <section class="section section-pink">
+    <div class="container">
+      <form class="contact-form" method="POST" onsubmit="handleContactForm(event)">
+        
+        <div class="form-group">
+          <label for="name">Your name</label>
+          <input type="text" id="name" name="name" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="company">Your company/organisation</label>
+          <input type="text" id="company" name="company">
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="phone">Phone number</label>
+          <input type="tel" id="phone" name="phone">
+        </div>
+        
+        <div class="form-group">
+          <label for="budget">Please select a rough budget range</label>
+          <select id="budget" name="budget">
+            <option value="">Select one...</option>
+            <option value="under-5k">Under $5,000</option>
+            <option value="5k-10k">$5,000 - $10,000</option>
+            <option value="10k-25k">$10,000 - $25,000</option>
+            <option value="25k-50k">$25,000 - $50,000</option>
+            <option value="over-50k">Over $50,000</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="message">How can we help?</label>
+          <textarea id="message" name="message" placeholder="Type your message..." required></textarea>
+        </div>
+        
+        <div class="form-submit">
+          <button type="submit" class="btn btn-secondary">SEND MESSAGE</button>
+        </div>
+        
+      </form>
+    </div>
+  </section>
+  
+  <footer class="site-footer">
+    <div class="container">
+      <div class="cta-card">
+        <h6 class="cta-eyebrow">We are here to help</h6>
+        <h2 class="cta-title">Tell us about your project</h2>
+        <a href="contact.html" class="audaz-link btn btn-black">Contact us</a>
+      </div>
+      <nav class="footer-nav">
+        <a href="services.html" class="audaz-link footer-link">Webflow Services</a>
+        <a href="retainers.html" class="audaz-link footer-link">Retainers</a>
+        <a href="portfolio.html" class="audaz-link footer-link">Portfolio</a>
+        <a href="contact.html" class="audaz-link footer-link">Contact</a>
+      </nav>
+      <div class="footer-divider"></div>
+      <div class="footer-bottom">
+        <img src="https://cdn.prod.website-files.com/66943a76af8106de4c764ba1/673538a22c59816e5b626f70_Audaz%20W%20copy.webp"
+             srcset="https://cdn.prod.website-files.com/66943a76af8106de4c764ba1/673538a22c59816e5b626f70_Audaz%20W%20copy-p-500.webp 500w, https://cdn.prod.website-files.com/66943a76af8106de4c764ba1/673538a22c59816e5b626f70_Audaz%20W%20copy.webp 1094w"
+             sizes="100px"
+             loading="lazy"
+             alt="Audaz Pro logo"
+             class="footer-logo-img">
+      </div>
+    </div>
+  </footer>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Portal - Audaz Pro</title>
+    <meta name="description" content="Audaz Pro support portal">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/tickets.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+</head>
+<body class="audaz-body">
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container">
+            <div class="header-grid">
+                <a href="/" class="logo-link">
+                    <img src="../images/Logo.svg" alt="Audaz Pro" class="logo-image">
+                </a>
+                <nav class="nav">
+                    <ul class="nav-menu">
+                        <li><a href="/" class="nav-link">Home</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Auth Section -->
+        <section class="auth-section">
+            <div class="container">
+                <div class="auth-container">
+                    <!-- Login Form -->
+                    <div class="auth-panel active" id="login-panel">
+                        <div class="auth-header">
+                        <div class="auth-badge">Support Portal</div>
+                        <h1>Restricted Access</h1>
+                        <p>Exclusive area for the Audaz Pro support team.</p>
+                        </div>
+
+                        <form id="login-form" class="auth-form">
+                            <div class="form-group">
+                                <label for="login-email">Email</label>
+                                <input type="email" id="login-email" name="email" required placeholder="seu@audazpro.ca">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="login-password">Password</label>
+                                <input type="password" id="login-password" name="password" required placeholder="Your password" minlength="6">
+                            </div>
+
+                            <div class="form-submit">
+                                <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+                            </div>
+                        </form>
+
+                        <div class="auth-footer">
+                            <p><a href="/client/index.html">Go to client portal</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-divider"></div>
+            <div class="footer-bottom">
+                <img src="../images/Logo.svg" alt="Audaz Pro" class="footer-logo-img">
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase-config.js"></script>
+    <script src="../js/services/auth.service.js"></script>
+    <script src="../js/services/invitations.service.js"></script>
+    <script src="../js/components/ui.components.js"></script>
+    <script src="../js/components/auth-guard.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Check if already authenticated as support
+            const isAuth = await AuthGuard.isAuthenticated();
+            if (isAuth) {
+                const profile = await AuthGuard.getProfile();
+                if (profile && AuthService.isSupport(profile)) {
+                    window.location.href = '/support/dashboard.html';
+                    return;
+                }
+            }
+
+            // Login form
+            document.getElementById('login-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = e.target.querySelector('button[type="submit"]');
+                UIComponents.setButtonLoading(btn, true);
+
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+
+                const result = await AuthService.signIn(email, password);
+
+                if (result.success) {
+                    const profile = await AuthGuard.getProfile();
+                    if (profile && AuthService.isSupport(profile)) {
+                        window.location.href = '/support/dashboard.html';
+                    } else {
+                UIComponents.showError('Access denied. This area is restricted to the support team.');
+                        await AuthService.signOut();
+                        UIComponents.setButtonLoading(btn, false);
+                    }
+                } else {
+                    UIComponents.showError(result.error);
+                    UIComponents.setButtonLoading(btn, false);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

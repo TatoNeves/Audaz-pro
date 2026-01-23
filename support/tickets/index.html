@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tickets - Audaz Pro Support</title>
+    <meta name="description" content="Ticket list for Audaz Pro support team">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/tickets.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../../images/favicon.ico">
+</head>
+<body class="audaz-body">
+    <!-- Header -->
+    <header class="site-header site-header-support">
+        <div class="container">
+            <div class="header-grid">
+                <a href="/support/dashboard.html" class="logo-link">
+                    <img src="../../images/Logo.svg" alt="Audaz Pro" class="logo-image">
+                    <span class="header-badge">Support</span>
+                </a>
+                <nav class="nav">
+                    <ul class="nav-menu">
+                        <li><a href="/support/dashboard.html" class="nav-link">Dashboard</a></li>
+                        <li><a href="/support/tickets/index.html" class="nav-link active">Tickets</a></li>
+                        <li><a href="/support/organizations.html" class="nav-link">Organizations</a></li>
+                    </ul>
+                    <div class="user-menu">
+                        <div class="user-avatar"></div>
+                        <span class="user-name">Loading...</span>
+                        <button class="logout-btn btn btn-secondary">Log Out</button>
+                    </div>
+                </nav>
+                <button class="mobile-toggle" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Page Header -->
+        <section class="dashboard-header dashboard-header-support">
+            <div class="container">
+                <div class="dashboard-header-content">
+                    <div class="dashboard-welcome">
+                        <h1>All Tickets</h1>
+                        <p>Manage tickets for every organization</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filters -->
+        <section class="filters-section">
+            <div class="container">
+                <div class="filters-bar filters-bar-extended">
+                    <div class="filter-group">
+                        <label for="filter-org">Organization</label>
+                        <select id="filter-org">
+                            <option value="">All</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-status">Status</label>
+                        <select id="filter-status">
+                            <option value="">All</option>
+                            <option value="open">Open</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="done">Done</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-type">Type</label>
+                        <select id="filter-type">
+                            <option value="">All</option>
+                            <option value="alteracao">Change Request</option>
+                            <option value="suporte">Support</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-priority">Priority</label>
+                        <select id="filter-priority">
+                            <option value="">All</option>
+                            <option value="baixa">Low</option>
+                            <option value="media">Normal</option>
+                            <option value="alta">High</option>
+                            <option value="urgente">Urgent</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-assigned">Assignee</label>
+                        <select id="filter-assigned">
+                            <option value="">All</option>
+                        </select>
+                    </div>
+                    <div class="filter-group filter-search">
+                        <label for="filter-search">Search</label>
+                        <input type="text" id="filter-search" placeholder="Search by title...">
+                    </div>
+                    <button class="btn btn-secondary filter-clear" id="clear-filters">Clear</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tickets List -->
+        <section class="tickets-section">
+            <div class="container">
+                <div class="ticket-list" id="tickets-list">
+                    <div class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <p>Loading tickets...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer site-footer-app">
+        <div class="container">
+            <div class="footer-bottom">
+                <img src="../../images/Logo.svg" alt="Audaz Pro" class="footer-logo-img">
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../js/supabase-config.js"></script>
+    <script src="../../js/services/auth.service.js"></script>
+    <script src="../../js/services/tickets.service.js"></script>
+    <script src="../../js/services/comments.service.js"></script>
+    <script src="../../js/services/invitations.service.js"></script>
+    <script src="../../js/components/ui.components.js"></script>
+    <script src="../../js/components/auth-guard.js"></script>
+    <script>
+        let currentFilters = {};
+        let debounceTimer = null;
+
+        // Priority to deadline days mapping
+        const PRIORITY_DEADLINE_DAYS = {
+            'urgente': 2,      // 48 hours
+            'alta': 3,         // 72 hours
+            'media': 7,        // 7 days
+            'baixa': 14        // 14 days
+        };
+
+        function calculateDeadline(createdAt, priority) {
+            const created = new Date(createdAt);
+            const days = PRIORITY_DEADLINE_DAYS[priority] || 7;
+            const deadline = new Date(created);
+            deadline.setDate(deadline.getDate() + days);
+            return deadline;
+        }
+
+        function formatDeadlineDate(date) {
+            const options = { month: 'short', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        function getDeadlineStatus(deadline) {
+            const now = new Date();
+            const diffTime = deadline - now;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays < 0) {
+                return { status: 'overdue', label: 'Overdue', daysText: `${Math.abs(diffDays)}d overdue`, sortPriority: -1000 + diffDays };
+            } else if (diffDays === 0) {
+                return { status: 'due-soon', label: 'Due Today', daysText: 'Due today', sortPriority: 0 };
+            } else if (diffDays <= 2) {
+                return { status: 'due-soon', label: 'Due Soon', daysText: `${diffDays}d left`, sortPriority: diffDays };
+            } else {
+                return { status: 'on-track', label: 'On Track', daysText: `${diffDays}d left`, sortPriority: diffDays };
+            }
+        }
+
+        function sortTicketsByDeadline(tickets) {
+            return tickets.map(ticket => {
+                const deadline = calculateDeadline(ticket.created_at, ticket.priority);
+                const deadlineStatus = getDeadlineStatus(deadline);
+                return {
+                    ...ticket,
+                    deadline,
+                    deadlineStatus
+                };
+            }).sort((a, b) => {
+                // Completed tickets go to the end
+                if (a.status === 'done' && b.status !== 'done') return 1;
+                if (a.status !== 'done' && b.status === 'done') return -1;
+                if (a.status === 'done' && b.status === 'done') {
+                    return new Date(b.updated_at) - new Date(a.updated_at);
+                }
+                // Sort by deadline urgency (most urgent first)
+                return a.deadlineStatus.sortPriority - b.deadlineStatus.sortPriority;
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Auth guard
+            const profile = await AuthGuard.init({
+                requiredRoles: ['support_agent', 'support_admin'],
+                redirectTo: '/support/index.html'
+            });
+
+            if (!profile) return;
+
+            // Update UI
+            AuthGuard.updateUserInfo(profile);
+            AuthGuard.setupLogoutButton();
+
+            // Mobile menu
+            const mobileToggle = document.querySelector('.mobile-toggle');
+            const nav = document.querySelector('.nav');
+            if (mobileToggle && nav) {
+                mobileToggle.addEventListener('click', () => nav.classList.toggle('active'));
+            }
+
+            // Load filter options
+            await loadFilterOptions();
+
+            // Setup filters
+            setupFilters();
+
+            // Load tickets
+            loadTickets();
+        });
+
+        async function loadFilterOptions() {
+            // Load organizations
+            const orgsResult = await TicketsService.getOrganizations();
+            if (orgsResult.success) {
+                const orgSelect = document.getElementById('filter-org');
+                orgsResult.organizations.forEach(org => {
+                    const option = document.createElement('option');
+                    option.value = org.id;
+                    option.textContent = org.name;
+                    orgSelect.appendChild(option);
+                });
+            }
+
+            // Load support agents
+            const agentsResult = await TicketsService.getSupportAgents();
+            if (agentsResult.success) {
+                const agentSelect = document.getElementById('filter-assigned');
+                agentsResult.agents.forEach(agent => {
+                    const option = document.createElement('option');
+                    option.value = agent.id;
+                    option.textContent = agent.full_name;
+                    agentSelect.appendChild(option);
+                });
+            }
+        }
+
+        function setupFilters() {
+            const orgFilter = document.getElementById('filter-org');
+            const statusFilter = document.getElementById('filter-status');
+            const typeFilter = document.getElementById('filter-type');
+            const priorityFilter = document.getElementById('filter-priority');
+            const assignedFilter = document.getElementById('filter-assigned');
+            const searchFilter = document.getElementById('filter-search');
+            const clearBtn = document.getElementById('clear-filters');
+
+            orgFilter.addEventListener('change', () => {
+                currentFilters.org_id = orgFilter.value || undefined;
+                loadTickets();
+            });
+
+            statusFilter.addEventListener('change', () => {
+                currentFilters.status = statusFilter.value || undefined;
+                loadTickets();
+            });
+
+            typeFilter.addEventListener('change', () => {
+                currentFilters.type = typeFilter.value || undefined;
+                loadTickets();
+            });
+
+            priorityFilter.addEventListener('change', () => {
+                currentFilters.priority = priorityFilter.value || undefined;
+                loadTickets();
+            });
+
+            assignedFilter.addEventListener('change', () => {
+                currentFilters.assigned_to = assignedFilter.value || undefined;
+                loadTickets();
+            });
+
+            searchFilter.addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    currentFilters.search = searchFilter.value || undefined;
+                    loadTickets();
+                }, 300);
+            });
+
+            clearBtn.addEventListener('click', () => {
+                orgFilter.value = '';
+                statusFilter.value = '';
+                typeFilter.value = '';
+                priorityFilter.value = '';
+                assignedFilter.value = '';
+                searchFilter.value = '';
+                currentFilters = {};
+                loadTickets();
+            });
+        }
+
+        async function loadTickets() {
+            const container = document.getElementById('tickets-list');
+            UIComponents.showLoading(container, 'Loading tickets...');
+
+            const result = await TicketsService.list(currentFilters);
+
+            if (!result.success) {
+                UIComponents.showError(result.error);
+                container.innerHTML = '<p class="error-message">Error loading tickets</p>';
+                return;
+            }
+
+            if (result.tickets.length === 0) {
+                const hasFilters = Object.keys(currentFilters).some(k => currentFilters[k]);
+                UIComponents.showEmptyState(container, {
+                    icon: hasFilters ? 'search' : 'ticket',
+                    title: hasFilters ? 'No results' : 'No tickets yet',
+                    message: hasFilters
+                        ? 'No tickets match the selected filters.'
+                        : 'No tickets are in the system yet.',
+                    actionText: hasFilters ? 'Clear Filters' : null,
+                    actionHandler: hasFilters
+                        ? () => document.getElementById('clear-filters').click()
+                        : null
+                });
+                return;
+            }
+
+            // Sort tickets by deadline urgency
+            const sortedTickets = sortTicketsByDeadline(result.tickets);
+
+            container.innerHTML = sortedTickets
+                .map(ticket => createTicketItemWithDeadline(ticket))
+                .join('');
+        }
+
+        function createTicketItemWithDeadline(ticket) {
+            const isCompleted = ticket.status === 'done';
+            const deadlineClass = !isCompleted && ticket.deadlineStatus ?
+                (ticket.deadlineStatus.status === 'overdue' ? 'is-overdue' :
+                 ticket.deadlineStatus.status === 'due-soon' ? 'is-due-soon' : '') : '';
+
+            return `
+                <a href="/support/tickets/detail.html?id=${ticket.id}" class="ticket-list-item ${deadlineClass}">
+                    <div class="ticket-list-main">
+                        <div class="ticket-list-header">
+                            ${UIComponents.createTypeBadge(ticket.type)}
+                            ${UIComponents.createPriorityBadge(ticket.priority)}
+                            ${UIComponents.createStatusBadge(ticket.status)}
+                            ${!isCompleted && ticket.deadlineStatus ? `
+                                <span class="deadline-badge ${ticket.deadlineStatus.status}">
+                                    ${ticket.deadlineStatus.status === 'overdue' ? '⚠️ ' : ''}${ticket.deadlineStatus.daysText}
+                                </span>
+                            ` : ''}
+                        </div>
+                        <h3 class="ticket-list-title">${UIComponents.escapeHtml(ticket.title)}</h3>
+                        <p class="ticket-list-desc">${UIComponents.escapeHtml(ticket.description?.substring(0, 120) || '')}${ticket.description?.length > 120 ? '...' : ''}</p>
+                        ${!isCompleted && ticket.deadline ? `
+                            <div class="ticket-deadline">
+                                <span class="deadline-label">Due: ${formatDeadlineDate(ticket.deadline)}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="ticket-list-meta">
+                        ${ticket.organization?.name ? `<span class="ticket-org">${UIComponents.escapeHtml(ticket.organization.name)}</span>` : ''}
+                        <span class="ticket-author">${UIComponents.escapeHtml(ticket.creator?.full_name || 'Unknown')}</span>
+                        <span class="ticket-date">${UIComponents.formatDate(ticket.created_at)}</span>
+                    </div>
+                </a>
+            `;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizations - Audaz Pro Support</title>
+    <meta name="description" content="Manage organization plans and request limits">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/tickets.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+</head>
+<body class="audaz-body">
+    <!-- Header -->
+    <header class="site-header site-header-support">
+        <div class="container">
+            <div class="header-grid">
+                <a href="/support/dashboard.html" class="logo-link">
+                    <img src="../images/Logo.svg" alt="Audaz Pro" class="logo-image">
+                    <span class="header-badge">Support</span>
+                </a>
+                <nav class="nav">
+                    <ul class="nav-menu">
+                        <li><a href="/support/dashboard.html" class="nav-link">Dashboard</a></li>
+                        <li><a href="/support/tickets/index.html" class="nav-link">Tickets</a></li>
+                        <li><a href="/support/organizations.html" class="nav-link active">Organizations</a></li>
+                    </ul>
+                    <div class="user-menu">
+                        <div class="user-avatar"></div>
+                        <span class="user-name">Loading...</span>
+                        <button class="logout-btn btn btn-secondary">Log Out</button>
+                    </div>
+                </nav>
+                <button class="mobile-toggle" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Page Header -->
+        <section class="dashboard-header dashboard-header-support">
+            <div class="container">
+                <div class="dashboard-header-content">
+                    <div class="dashboard-welcome">
+                        <h1>Organizations</h1>
+                        <p>Manage client organizations and their monthly request limits</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search & Filters -->
+        <section class="filters-section">
+            <div class="container">
+                <div class="filters-bar">
+                    <div class="filter-group filter-search">
+                        <label for="search-input">Search</label>
+                        <input type="text" id="search-input" placeholder="Search organizations...">
+                    </div>
+                    <div class="filter-group">
+                        <label for="plan-filter">Plan</label>
+                        <select id="plan-filter">
+                            <option value="">All Plans</option>
+                            <option value="Basic">Basic</option>
+                            <option value="Pro">Pro</option>
+                            <option value="Enterprise">Enterprise</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Organizations List -->
+        <section class="tickets-section">
+            <div class="container">
+                <div class="section-header-row">
+                    <h2>All Organizations</h2>
+                    <div class="section-header-actions">
+                        <span class="org-count" id="org-count">0 organizations</span>
+                        <button class="btn btn-primary" id="btn-new-org" style="display: none;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                                <line x1="12" y1="5" x2="12" y2="19"/>
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
+                            New Organization
+                        </button>
+                    </div>
+                </div>
+                <div class="organizations-list" id="organizations-list">
+                    <div class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <p>Loading organizations...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Edit Organization Modal -->
+    <div class="modal-overlay" id="edit-modal" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit Organization Limits</h3>
+                <button class="modal-close" onclick="closeEditModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="org-info-display">
+                    <p class="org-modal-name" id="modal-org-name">Organization Name</p>
+                    <p class="org-modal-stats" id="modal-org-stats">0 members • 0 total tickets</p>
+                </div>
+
+                <form id="edit-org-form">
+                    <input type="hidden" id="edit-org-id">
+
+                    <div class="form-group">
+                        <label for="edit-plan-name">Plan Name</label>
+                        <select id="edit-plan-name" required>
+                            <option value="Basic">Basic</option>
+                            <option value="Pro">Pro</option>
+                            <option value="Enterprise">Enterprise</option>
+                            <option value="Custom">Custom</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-monthly-limit">Monthly Request Limit</label>
+                        <input type="number" id="edit-monthly-limit" min="0" max="1000" required>
+                        <small class="form-hint">Maximum number of tickets this organization can create per month</small>
+                    </div>
+
+                    <div class="form-info-box">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="16" x2="12" y2="12"/>
+                            <line x1="12" y1="8" x2="12.01" y2="8"/>
+                        </svg>
+                        <p>Changes take effect immediately. The organization will be able to create tickets up to the new limit.</p>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                <button type="submit" form="edit-org-form" class="btn btn-primary" id="save-org-btn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Organization Modal -->
+    <div class="modal-overlay" id="create-modal" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 class="modal-title">Create New Organization</h3>
+                <button class="modal-close" onclick="closeCreateModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="create-org-form">
+                    <div class="form-group">
+                        <label for="create-org-name">Organization Name *</label>
+                        <input type="text" id="create-org-name" required placeholder="Enter organization name">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="create-plan-name">Plan</label>
+                            <select id="create-plan-name">
+                                <option value="Basic">Basic</option>
+                                <option value="Pro">Pro</option>
+                                <option value="Enterprise">Enterprise</option>
+                                <option value="Custom">Custom</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="create-monthly-limit">Monthly Limit</label>
+                            <input type="number" id="create-monthly-limit" min="0" max="1000" value="10">
+                        </div>
+                    </div>
+
+                    <div class="form-info-box">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="16" x2="12" y2="12"/>
+                            <line x1="12" y1="8" x2="12.01" y2="8"/>
+                        </svg>
+                        <p>After creating the organization, you can invite members to it.</p>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeCreateModal()">Cancel</button>
+                <button type="submit" form="create-org-form" class="btn btn-primary" id="create-org-btn">Create Organization</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invite Member Modal -->
+    <div class="modal-overlay" id="invite-modal" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 class="modal-title">Invite Member</h3>
+                <button class="modal-close" onclick="closeInviteModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="org-info-display">
+                    <p class="org-modal-name" id="invite-org-name">Organization Name</p>
+                </div>
+
+                <form id="invite-member-form">
+                    <input type="hidden" id="invite-org-id">
+
+                    <div class="form-group">
+                        <label for="invite-email">Email Address *</label>
+                        <input type="email" id="invite-email" required placeholder="member@example.com">
+                        <small class="form-hint">An invitation link will be sent to this email</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="invite-role">Role</label>
+                        <select id="invite-role">
+                            <option value="client_user">User</option>
+                            <option value="client_admin">Administrator</option>
+                        </select>
+                        <small class="form-hint">Administrators can manage team members and settings</small>
+                    </div>
+                </form>
+
+                <!-- Pending Invitations -->
+                <div class="pending-invitations" id="pending-invitations" style="display: none;">
+                    <h4>Pending Invitations</h4>
+                    <div class="invitations-list" id="invitations-list"></div>
+                </div>
+
+                <!-- Current Members -->
+                <div class="current-members" id="current-members" style="display: none;">
+                    <h4>Current Members</h4>
+                    <div class="members-list" id="members-list"></div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeInviteModal()">Close</button>
+                <button type="submit" form="invite-member-form" class="btn btn-primary" id="send-invite-btn">Send Invitation</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="delete-modal" style="display: none;">
+        <div class="modal-dialog modal-dialog-small">
+            <div class="modal-header">
+                <h3 class="modal-title">Delete Organization</h3>
+                <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="delete-warning">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="48" height="48">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    <p class="delete-warning-text">Are you sure you want to delete <strong id="delete-org-name"></strong>?</p>
+                    <p class="delete-warning-info">This action cannot be undone. All tickets, comments, and data associated with this organization will be permanently deleted.</p>
+                </div>
+                <input type="hidden" id="delete-org-id">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-delete-btn" onclick="confirmDelete()">Delete Organization</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer site-footer-app">
+        <div class="container">
+            <div class="footer-bottom">
+                <img src="../images/Logo.svg" alt="Audaz Pro" class="footer-logo-img">
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase-config.js"></script>
+    <script src="../js/services/auth.service.js"></script>
+    <script src="../js/services/tickets.service.js"></script>
+    <script src="../js/services/comments.service.js"></script>
+    <script src="../js/services/invitations.service.js"></script>
+    <script src="../js/components/ui.components.js"></script>
+    <script src="../js/components/auth-guard.js"></script>
+    <script>
+        let organizations = [];
+        let currentProfile = null;
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Auth guard - require support roles
+            currentProfile = await AuthGuard.init({
+                requiredRoles: ['support_agent', 'support_admin'],
+                redirectTo: '/support/index.html'
+            });
+
+            if (!currentProfile) return;
+
+            // Update UI
+            AuthGuard.updateUserInfo(currentProfile);
+            AuthGuard.setupLogoutButton();
+
+            // Show admin-only buttons
+            if (currentProfile.role === 'support_admin') {
+                document.getElementById('btn-new-org').style.display = 'flex';
+            }
+
+            // Mobile menu
+            const mobileToggle = document.querySelector('.mobile-toggle');
+            const nav = document.querySelector('.nav');
+            if (mobileToggle && nav) {
+                mobileToggle.addEventListener('click', () => nav.classList.toggle('active'));
+            }
+
+            // Setup search and filters
+            setupFilters();
+
+            // Setup forms
+            document.getElementById('edit-org-form').addEventListener('submit', handleSaveOrg);
+            document.getElementById('create-org-form').addEventListener('submit', handleCreateOrg);
+            document.getElementById('invite-member-form').addEventListener('submit', handleSendInvite);
+
+            // Setup new org button
+            document.getElementById('btn-new-org').addEventListener('click', openCreateModal);
+
+            // Load organizations
+            loadOrganizations();
+        });
+
+        function setupFilters() {
+            const searchInput = document.getElementById('search-input');
+            const planFilter = document.getElementById('plan-filter');
+
+            let debounceTimer;
+            searchInput.addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(renderOrganizations, 300);
+            });
+
+            planFilter.addEventListener('change', renderOrganizations);
+        }
+
+        async function loadOrganizations() {
+            const container = document.getElementById('organizations-list');
+            UIComponents.showLoading(container, 'Loading organizations...');
+
+            const client = AudazSupabase.getClient();
+            if (!client) {
+                UIComponents.showError('Supabase not configured');
+                return;
+            }
+
+            try {
+                const { data, error } = await client.rpc('get_organizations_with_usage');
+
+                if (error) {
+                    console.error('Load organizations error:', error);
+                    container.innerHTML = '<p class="error-message">Error loading organizations</p>';
+                    return;
+                }
+
+                organizations = data || [];
+                renderOrganizations();
+            } catch (err) {
+                console.error('Load organizations error:', err);
+                container.innerHTML = '<p class="error-message">Error loading organizations</p>';
+            }
+        }
+
+        function renderOrganizations() {
+            const container = document.getElementById('organizations-list');
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const planFilter = document.getElementById('plan-filter').value;
+
+            // Filter organizations
+            let filtered = organizations;
+
+            if (searchTerm) {
+                filtered = filtered.filter(org =>
+                    org.org_name.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            if (planFilter) {
+                filtered = filtered.filter(org => org.plan_name === planFilter);
+            }
+
+            // Update count
+            document.getElementById('org-count').textContent = `${filtered.length} organization${filtered.length !== 1 ? 's' : ''}`;
+
+            if (filtered.length === 0) {
+                UIComponents.showEmptyState(container, {
+                    icon: 'building',
+                    title: 'No organizations found',
+                    message: searchTerm || planFilter
+                        ? 'No organizations match your filters.'
+                        : 'No organizations have been created yet.'
+                });
+                return;
+            }
+
+            container.innerHTML = filtered.map(org => createOrgCard(org)).join('');
+
+            // Add click handlers for edit buttons
+            container.querySelectorAll('.btn-edit-org').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const orgId = btn.dataset.orgId;
+                    const org = organizations.find(o => o.org_id === orgId);
+                    if (org) openEditModal(org);
+                });
+            });
+
+            // Add click handlers for invite buttons
+            container.querySelectorAll('.btn-invite-org').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const orgId = btn.dataset.orgId;
+                    const orgName = btn.dataset.orgName;
+                    openInviteModal(orgId, orgName);
+                });
+            });
+
+            // Add click handlers for delete buttons
+            container.querySelectorAll('.btn-delete-org').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const orgId = btn.dataset.orgId;
+                    const orgName = btn.dataset.orgName;
+                    openDeleteModal(orgId, orgName);
+                });
+            });
+        }
+
+        function createOrgCard(org) {
+            const usagePercent = org.monthly_limit > 0
+                ? Math.min((org.tickets_used_this_month / org.monthly_limit) * 100, 100)
+                : 0;
+
+            const usageClass = usagePercent >= 90 ? 'usage-critical' :
+                               usagePercent >= 70 ? 'usage-warning' : 'usage-normal';
+
+            const isAdmin = currentProfile.role === 'support_admin';
+
+            return `
+                <div class="org-card">
+                    <div class="org-card-header">
+                        <div class="org-info">
+                            <h3 class="org-name">${escapeHtml(org.org_name)}</h3>
+                            <span class="plan-badge plan-${org.plan_name.toLowerCase()}">${org.plan_name}</span>
+                        </div>
+                        ${isAdmin ? `
+                        <div class="org-card-actions">
+                            <button class="btn btn-secondary btn-small btn-invite-org" data-org-id="${org.org_id}" data-org-name="${escapeHtml(org.org_name)}" title="Invite Member">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="8.5" cy="7" r="4"/>
+                                    <line x1="20" y1="8" x2="20" y2="14"/>
+                                    <line x1="23" y1="11" x2="17" y2="11"/>
+                                </svg>
+                            </button>
+                            <button class="btn btn-secondary btn-small btn-edit-org" data-org-id="${org.org_id}" title="Edit Limits">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                </svg>
+                            </button>
+                            <button class="btn btn-danger-outline btn-small btn-delete-org" data-org-id="${org.org_id}" data-org-name="${escapeHtml(org.org_name)}" title="Delete Organization">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                    <polyline points="3 6 5 6 21 6"/>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                    <line x1="10" y1="11" x2="10" y2="17"/>
+                                    <line x1="14" y1="11" x2="14" y2="17"/>
+                                </svg>
+                            </button>
+                        </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="org-stats-row">
+                        <div class="org-stat">
+                            <span class="org-stat-value">${org.member_count}</span>
+                            <span class="org-stat-label">Members</span>
+                        </div>
+                        <div class="org-stat">
+                            <span class="org-stat-value">${org.total_tickets}</span>
+                            <span class="org-stat-label">Total Tickets</span>
+                        </div>
+                        <div class="org-stat">
+                            <span class="org-stat-value">${org.monthly_limit}</span>
+                            <span class="org-stat-label">Monthly Limit</span>
+                        </div>
+                    </div>
+
+                    <div class="org-usage">
+                        <div class="usage-header">
+                            <span class="usage-label">Monthly Usage</span>
+                            <span class="usage-value ${usageClass}">${org.tickets_used_this_month} / ${org.monthly_limit}</span>
+                        </div>
+                        <div class="usage-bar">
+                            <div class="usage-bar-fill ${usageClass}" style="width: ${usagePercent}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="org-card-footer">
+                        <span class="org-date">Created ${UIComponents.formatDate(org.created_at)}</span>
+                        <a href="/support/tickets/index.html?org=${org.org_id}" class="view-tickets-link">
+                            View Tickets
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function openEditModal(org) {
+            document.getElementById('edit-org-id').value = org.org_id;
+            document.getElementById('modal-org-name').textContent = org.org_name;
+            document.getElementById('modal-org-stats').textContent = `${org.member_count} members • ${org.total_tickets} total tickets`;
+            document.getElementById('edit-plan-name').value = org.plan_name;
+            document.getElementById('edit-monthly-limit').value = org.monthly_limit;
+            document.getElementById('edit-modal').style.display = 'flex';
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').style.display = 'none';
+        }
+
+        async function handleSaveOrg(e) {
+            e.preventDefault();
+
+            const btn = document.getElementById('save-org-btn');
+            const orgId = document.getElementById('edit-org-id').value;
+            const planName = document.getElementById('edit-plan-name').value;
+            const monthlyLimit = parseInt(document.getElementById('edit-monthly-limit').value, 10);
+
+            if (monthlyLimit < 0) {
+                UIComponents.showError('Monthly limit must be non-negative');
+                return;
+            }
+
+            UIComponents.setButtonLoading(btn, true);
+
+            const client = AudazSupabase.getClient();
+            if (!client) {
+                UIComponents.showError('Supabase not configured');
+                UIComponents.setButtonLoading(btn, false);
+                return;
+            }
+
+            try {
+                const { data, error } = await client.rpc('update_org_limits', {
+                    p_org_id: orgId,
+                    p_monthly_limit: monthlyLimit,
+                    p_plan_name: planName
+                });
+
+                if (error) {
+                    console.error('Update org error:', error);
+                    UIComponents.showError('Error updating organization');
+                    UIComponents.setButtonLoading(btn, false);
+                    return;
+                }
+
+                if (!data.success) {
+                    UIComponents.showError(data.error || 'Error updating organization');
+                    UIComponents.setButtonLoading(btn, false);
+                    return;
+                }
+
+                UIComponents.showSuccess('Organization updated successfully');
+                closeEditModal();
+
+                // Reload organizations
+                loadOrganizations();
+            } catch (err) {
+                console.error('Update org error:', err);
+                UIComponents.showError('Unexpected error');
+            }
+
+            UIComponents.setButtonLoading(btn, false);
+        }
+
+        // Close modal on outside click
+        document.getElementById('edit-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEditModal();
+            }
+        });
+
+        document.getElementById('create-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCreateModal();
+            }
+        });
+
+        document.getElementById('invite-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeInviteModal();
+            }
+        });
+
+        document.getElementById('delete-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeleteModal();
+            }
+        });
+
+        // ============================================
+        // CREATE ORGANIZATION
+        // ============================================
+        function openCreateModal() {
+            document.getElementById('create-org-name').value = '';
+            document.getElementById('create-plan-name').value = 'Basic';
+            document.getElementById('create-monthly-limit').value = '10';
+            document.getElementById('create-modal').style.display = 'flex';
+        }
+
+        function closeCreateModal() {
+            document.getElementById('create-modal').style.display = 'none';
+        }
+
+        async function handleCreateOrg(e) {
+            e.preventDefault();
+
+            const btn = document.getElementById('create-org-btn');
+            const name = document.getElementById('create-org-name').value.trim();
+            const planName = document.getElementById('create-plan-name').value;
+            const monthlyLimit = parseInt(document.getElementById('create-monthly-limit').value, 10);
+
+            if (!name) {
+                UIComponents.showError('Organization name is required');
+                return;
+            }
+
+            UIComponents.setButtonLoading(btn, true);
+
+            const client = AudazSupabase.getClient();
+            if (!client) {
+                UIComponents.showError('Supabase not configured');
+                UIComponents.setButtonLoading(btn, false);
+                return;
+            }
+
+            try {
+                const { data, error } = await client.rpc('create_organization_by_support', {
+                    p_name: name,
+                    p_plan_name: planName,
+                    p_monthly_limit: monthlyLimit
+                });
+
+                if (error) {
+                    console.error('Create org error:', error);
+                    UIComponents.showError('Error creating organization');
+                    UIComponents.setButtonLoading(btn, false);
+                    return;
+                }
+
+                if (!data.success) {
+                    UIComponents.showError(data.error || 'Error creating organization');
+                    UIComponents.setButtonLoading(btn, false);
+                    return;
+                }
+
+                UIComponents.showSuccess('Organization created successfully');
+                closeCreateModal();
+                loadOrganizations();
+            } catch (err) {
+                console.error('Create org error:', err);
+                UIComponents.showError('Unexpected error');
+            }
+
+            UIComponents.setButtonLoading(btn, false);
+        }
+
+        // ============================================
+        // INVITE MEMBER
+        // ============================================
+        function openInviteModal(orgId, orgName) {
+            document.getElementById('invite-org-id').value = orgId;
+            document.getElementById('invite-org-name').textContent = orgName;
+            document.getElementById('invite-email').value = '';
+            document.getElementById('invite-role').value = 'client_user';
+            document.getElementById('invite-modal').style.display = 'flex';
+
+            // Load pending invitations and members
+            loadOrgInvitations(orgId);
+            loadOrgMembers(orgId);
+        }
+
+        function closeInviteModal() {
+            document.getElementById('invite-modal').style.display = 'none';
+        }
+
+        async function loadOrgInvitations(orgId) {
+            const container = document.getElementById('pending-invitations');
+            const list = document.getElementById('invitations-list');
+
+            const client = AudazSupabase.getClient();
+            if (!client) return;
+
+            try {
+                const { data, error } = await client.rpc('get_org_invitations_by_support', {
+                    p_org_id: orgId
+                });
+
+                if (error) {
+                    console.error('Load invitations error:', error);
+                    return;
+                }
+
+                const pending = (data || []).filter(inv => inv.status === 'pending');
+
+                if (pending.length === 0) {
+                    container.style.display = 'none';
+                    return;
+                }
+
+                container.style.display = 'block';
+                list.innerHTML = pending.map(inv => `
+                    <div class="invitation-item">
+                        <div class="invitation-info">
+                            <span class="invitation-email">${escapeHtml(inv.email)}</span>
+                            <span class="invitation-role">${formatRole(inv.role)}</span>
+                        </div>
+                        <div class="invitation-actions">
+                            <button class="btn btn-small btn-secondary btn-copy-link" data-token="${inv.token}" title="Copy Invite Link">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                </svg>
+                            </button>
+                            <button class="btn btn-small btn-danger-outline btn-cancel-invite" data-invitation-id="${inv.invitation_id}" title="Cancel Invitation">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                                    <line x1="18" y1="6" x2="6" y2="18"/>
+                                    <line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Add click handlers
+                list.querySelectorAll('.btn-copy-link').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const token = btn.dataset.token;
+                        const url = `${window.location.origin}/invite/index.html?token=${token}`;
+                        navigator.clipboard.writeText(url).then(() => {
+                            UIComponents.showSuccess('Invite link copied to clipboard');
+                        });
+                    });
+                });
+
+                list.querySelectorAll('.btn-cancel-invite').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const invitationId = btn.dataset.invitationId;
+                        await cancelInvitation(invitationId, orgId);
+                    });
+                });
+            } catch (err) {
+                console.error('Load invitations error:', err);
+            }
+        }
+
+        async function loadOrgMembers(orgId) {
+            const container = document.getElementById('current-members');
+            const list = document.getElementById('members-list');
+
+            const client = AudazSupabase.getClient();
+            if (!client) return;
+
+            try {
+                const { data, error } = await client.rpc('get_org_members_by_support', {
+                    p_org_id: orgId
+                });
+
+                if (error) {
+                    console.error('Load members error:', error);
+                    return;
+                }
+
+                if (!data || data.length === 0) {
+                    container.style.display = 'none';
+                    return;
+                }
+
+                container.style.display = 'block';
+                list.innerHTML = data.map(member => `
+                    <div class="member-item">
+                        <div class="member-avatar">${(member.full_name || 'U').charAt(0).toUpperCase()}</div>
+                        <div class="member-info">
+                            <span class="member-name">${escapeHtml(member.full_name || 'Unknown')}</span>
+                            <span class="member-email">${escapeHtml(member.email || '')}</span>
+                        </div>
+                        <span class="member-role">${formatRole(member.role)}</span>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error('Load members error:', err);
+            }
+        }
+
+        async function handleSendInvite(e) {
+            e.preventDefault();
+
+            const btn = document.getElementById('send-invite-btn');
+            const orgId = document.getElementById('invite-org-id').value;
+            const email = document.getElementById('invite-email').value.trim();
+            const role = document.getElementById('invite-role').value;
+
+            if (!email) {
+                UIComponents.showError('Email is required');
+                return;
+            }
+
+            UIComponents.setButtonLoading(btn, true);
+
+            const client = AudazSupabase.getClient();
+            if (!client) {
+                UIComponents.showError('Supabase not configured');
+                UIComponents.setButtonLoading(btn, false);
+                return;
+            }
+
+            try {
+                const { data, error } = await client.rpc('invite_member_to_org', {
+                    p_org_id: orgId,
+                    p_email: email,
+                    p_role: role
+                });
+
+                if (error) {
+                    console.error('Invite error:', error);
+                    UIComponents.showError('Error sending invitation');
+                    UIComponents.setButtonLoading(btn, false);
+                    return;
+                }
+
+                if (!data.success) {
+                    UIComponents.showError(data.error || 'Error sending invitation');
+                    UIComponents.setButtonLoading(btn, false);
+                    return;
+                }
+
+                // Show success with invite link
+                const inviteUrl = `${window.location.origin}/invite/index.html?token=${data.token}`;
+                UIComponents.showSuccess(`Invitation sent to ${email}`);
+
+                // Clear email field and reload invitations
+                document.getElementById('invite-email').value = '';
+                loadOrgInvitations(orgId);
+                loadOrganizations();
+            } catch (err) {
+                console.error('Invite error:', err);
+                UIComponents.showError('Unexpected error');
+            }
+
+            UIComponents.setButtonLoading(btn, false);
+        }
+
+        async function cancelInvitation(invitationId, orgId) {
+            const client = AudazSupabase.getClient();
+            if (!client) return;
+
+            try {
+                const { data, error } = await client.rpc('cancel_invitation_by_support', {
+                    p_invitation_id: invitationId
+                });
+
+                if (error) {
+                    console.error('Cancel invitation error:', error);
+                    UIComponents.showError('Error cancelling invitation');
+                    return;
+                }
+
+                if (!data.success) {
+                    UIComponents.showError(data.error || 'Error cancelling invitation');
+                    return;
+                }
+
+                UIComponents.showSuccess('Invitation cancelled');
+                loadOrgInvitations(orgId);
+            } catch (err) {
+                console.error('Cancel invitation error:', err);
+                UIComponents.showError('Unexpected error');
+            }
+        }
+
+        function formatRole(role) {
+            const translations = {
+                'client_admin': 'Administrator',
+                'client_user': 'User',
+                'support_agent': 'Support Agent',
+                'support_admin': 'Support Admin'
+            };
+            return translations[role] || role;
+        }
+
+        // ============================================
+        // DELETE ORGANIZATION
+        // ============================================
+        function openDeleteModal(orgId, orgName) {
+            document.getElementById('delete-org-id').value = orgId;
+            document.getElementById('delete-org-name').textContent = orgName;
+            document.getElementById('delete-modal').style.display = 'flex';
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('delete-modal').style.display = 'none';
+        }
+
+        async function confirmDelete() {
+            const btn = document.getElementById('confirm-delete-btn');
+            const orgId = document.getElementById('delete-org-id').value;
+
+            UIComponents.setButtonLoading(btn, true);
+
+            const client = AudazSupabase.getClient();
+            if (!client) {
+                UIComponents.showError('Supabase not configured');
+                UIComponents.setButtonLoading(btn, false);
+                return;
+            }
+
+            try {
+                const { data, error } = await client.rpc('delete_organization_by_support', {
+                    p_org_id: orgId
+                });
+
+                if (error) {
+                    console.error('Delete org error:', error);
+                    UIComponents.showError('Error deleting organization');
+                    UIComponents.setButtonLoading(btn, false);
+                    return;
+                }
+
+                if (!data.success) {
+                    UIComponents.showError(data.error || 'Error deleting organization');
+                    UIComponents.setButtonLoading(btn, false);
+                    return;
+                }
+
+                UIComponents.showSuccess('Organization deleted successfully');
+                closeDeleteModal();
+                loadOrganizations();
+            } catch (err) {
+                console.error('Delete org error:', err);
+                UIComponents.showError('Unexpected error');
+            }
+
+            UIComponents.setButtonLoading(btn, false);
+        }
+    </script>
+</body>
+</html>

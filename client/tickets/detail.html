@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket - Audaz Pro</title>
+    <meta name="description" content="Audaz Pro ticket details">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/tickets.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../../images/favicon-32x32.png">
+</head>
+<body class="audaz-body">
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container">
+            <div class="header-grid">
+                <a href="/client/dashboard.html" class="logo-link">
+                    <img src="../../images/66943b1c1348ffa2b811c19c_Audaz Black.png" alt="Audaz Pro" class="logo-image">
+                </a>
+                <nav class="nav">
+                    <ul class="nav-menu">
+                        <li><a href="/client/dashboard.html" class="nav-link">Dashboard</a></li>
+                        <li><a href="/client/tickets/index.html" class="nav-link active">Tickets</a></li>
+                        <li><a href="/client/settings/team.html" class="nav-link">Team</a></li>
+                    </ul>
+                    <div class="user-menu">
+                        <div class="user-avatar"></div>
+                        <span class="user-name">Loading...</span>
+                        <button class="logout-btn btn btn-secondary">Log Out</button>
+                    </div>
+                </nav>
+                <button class="mobile-toggle" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Page Header -->
+        <section class="dashboard-header">
+            <div class="container">
+                <div class="dashboard-header-content">
+                    <div class="dashboard-welcome">
+                        <a href="/client/tickets/index.html" class="back-link">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                                <path d="M19 12H5M12 19l-7-7 7-7"/>
+                            </svg>
+                            Back to Tickets
+                        </a>
+                        <h1 id="ticket-title">Loading...</h1>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Ticket Content -->
+        <section class="ticket-detail-section">
+            <div class="container">
+                <div class="ticket-detail-grid">
+                    <!-- Main Content -->
+                    <div class="ticket-main">
+                        <!-- Ticket Info -->
+                        <div class="ticket-card" id="ticket-info">
+                                <div class="loading-state">
+                                    <div class="loading-spinner"></div>
+                                    <p>Loading ticket...</p>
+                                </div>
+                        </div>
+
+                        <!-- Comments Section -->
+                        <div class="ticket-card">
+                            <h3 class="card-title">Comments</h3>
+                            <div class="comments-thread" id="comments-thread">
+                                <div class="loading-state">
+                                    <div class="loading-spinner"></div>
+                                    <p>Loading...</p>
+                                </div>
+                            </div>
+
+                            <!-- Add Comment Form -->
+                            <form id="comment-form" class="comment-form">
+                                <div class="comment-composer">
+                                    <div class="composer-avatar" id="composer-avatar" aria-hidden="true">You</div>
+                                    <div class="composer-input">
+                                        <div class="comment-toolbar">
+                                            <button type="button" class="toolbar-btn" data-action="attach-file" title="Attach file">
+                                                <span>📎</span>
+                                            </button>
+                                            <button type="button" class="toolbar-btn" data-action="mention" title="Mention someone">
+                                                <span>@</span>
+                                            </button>
+                                            <button type="button" class="toolbar-btn" data-action="emoji" title="Insert emoji">
+                                                <span>😊</span>
+                                            </button>
+                                            <div class="mention-panel" id="mention-panel"></div>
+                                        </div>
+                                        <textarea id="comment-body" class="composer-textarea" name="body" placeholder="Write your comment..." rows="4"></textarea>
+                                        <input type="file" id="attachment-input" multiple accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar" hidden>
+                                        <div class="composer-attachments" id="attachment-preview"></div>
+                                        <div class="composer-footer">
+                                            <span class="notification-text" id="comment-notification-text">0 people will be notified</span>
+                                            <button type="submit" class="btn btn-primary">Comment</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Sidebar -->
+                    <div class="ticket-sidebar">
+                        <!-- Actions Card -->
+                        <div class="ticket-card" id="ticket-actions-card" style="display: none;">
+                            <h3 class="card-title">Actions</h3>
+                            <div class="ticket-actions">
+                                <button type="button" id="cancel-ticket-btn" class="btn btn-warning btn-block">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <line x1="15" y1="9" x2="9" y2="15"/>
+                                        <line x1="9" y1="9" x2="15" y2="15"/>
+                                    </svg>
+                                    Cancel Ticket
+                                </button>
+                                <button type="button" id="delete-ticket-btn" class="btn btn-danger btn-block">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                        <polyline points="3 6 5 6 21 6"/>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                        <line x1="10" y1="11" x2="10" y2="17"/>
+                                        <line x1="14" y1="11" x2="14" y2="17"/>
+                                    </svg>
+                                    Delete Ticket
+                                </button>
+                            </div>
+                            <p class="actions-note" id="actions-note" style="display: none;"></p>
+                        </div>
+
+                        <!-- Assigned Notice Card -->
+                        <div class="ticket-card" id="assigned-notice-card" style="display: none;">
+                            <div class="assigned-notice">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="12" y1="16" x2="12" y2="12"/>
+                                    <line x1="12" y1="8" x2="12.01" y2="8"/>
+                                </svg>
+                                <p>This ticket has been assigned to a support agent and is being worked on. You cannot cancel or delete it at this time.</p>
+                            </div>
+                        </div>
+
+                        <!-- Status Card -->
+                        <div class="ticket-card">
+                            <h3 class="card-title">Status</h3>
+                            <div id="ticket-status-info">
+                                <div class="loading-state small">
+                                    <div class="loading-spinner"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Collaborators Card -->
+                        <div class="ticket-card">
+                            <h3 class="card-title">Collaborators</h3>
+                            <div id="collaborators-container">
+                                <div class="loading-state small">
+                                    <div class="loading-spinner"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Timeline -->
+                        <div class="ticket-card">
+                            <h3 class="card-title">Timeline</h3>
+                            <div class="timeline" id="ticket-timeline">
+                                <div class="loading-state small">
+                                    <div class="loading-spinner"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer site-footer-app">
+        <div class="container">
+            <div class="footer-bottom">
+                <img src="../../images/66943b1c1348ffa2b811c19c_Audaz Black.png" alt="Audaz Pro" class="footer-logo-img">
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../js/supabase-config.js"></script>
+    <script src="../../js/services/auth.service.js"></script>
+    <script src="../../js/services/tickets.service.js"></script>
+    <script src="../../js/services/comments.service.js"></script>
+    <script src="../../js/services/invitations.service.js"></script>
+    <script src="../../js/services/collaborators.service.js"></script>
+    <script src="../../js/components/ui.components.js"></script>
+    <script src="../../js/components/auth-guard.js"></script>
+    <script>
+        const EMOJI_LIST = ['😀','😄','😉','😍','👍','🤝','📎','📝','✨','🚀','🧠','🎯'];
+        let currentTicket = null;
+        let currentProfile = null;
+        let pendingAttachments = [];
+        let mentionableUsers = [];
+        let ticketCollaborators = [];
+        let commentEditor = null;
+        let mentionPanelElement = null;
+        let emojiPanelElement = null;
+        let attachmentsPreviewElement = null;
+        let attachmentInputElement = null;
+
+        // Priority to deadline days mapping
+        const PRIORITY_DEADLINE_DAYS = {
+            'urgente': 2,      // 48 hours
+            'alta': 3,         // 72 hours
+            'media': 7,        // 7 days
+            'baixa': 14        // 14 days
+        };
+
+        function calculateDeadline(createdAt, priority) {
+            const created = new Date(createdAt);
+            const days = PRIORITY_DEADLINE_DAYS[priority] || 7;
+            const deadline = new Date(created);
+            deadline.setDate(deadline.getDate() + days);
+            return deadline;
+        }
+
+        function formatDeadlineDate(date) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        function getDeadlineStatus(deadline) {
+            const now = new Date();
+            const diffTime = deadline - now;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays < 0) {
+                return { status: 'overdue', label: 'Overdue', daysText: `${Math.abs(diffDays)} day${Math.abs(diffDays) !== 1 ? 's' : ''} overdue` };
+            } else if (diffDays === 0) {
+                return { status: 'due-soon', label: 'Due Today', daysText: 'Due today' };
+            } else if (diffDays <= 2) {
+                return { status: 'due-soon', label: 'Due Soon', daysText: `${diffDays} day${diffDays !== 1 ? 's' : ''} left` };
+            } else {
+                return { status: 'on-track', label: 'On Track', daysText: `${diffDays} days left` };
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Auth guard
+            const profile = await AuthGuard.init({
+                requiredRoles: ['client_admin', 'client_user'],
+                redirectTo: '/client/index.html'
+            });
+
+            if (!profile) return;
+
+            currentProfile = profile;
+
+            // Update UI
+            AuthGuard.updateUserInfo(profile);
+            AuthGuard.setupLogoutButton();
+
+            // Mobile menu
+            const mobileToggle = document.querySelector('.mobile-toggle');
+            const nav = document.querySelector('.nav');
+            if (mobileToggle && nav) {
+                mobileToggle.addEventListener('click', () => nav.classList.toggle('active'));
+            }
+
+            // Get ticket ID from URL
+            const params = new URLSearchParams(window.location.search);
+            const ticketId = params.get('id');
+
+            if (!ticketId) {
+                UIComponents.showError('Ticket not found');
+                window.location.href = '/client/tickets/index.html';
+                return;
+            }
+
+            // Setup composer
+            setupCommentComposer(profile);
+
+            // Load ticket
+            await loadTicket(ticketId);
+            await loadOrganizationMembers(currentTicket.organization?.id);
+            await loadCollaborators(ticketId);
+            await loadComments(ticketId);
+            await loadTimeline(ticketId);
+        });
+
+        async function loadTicket(ticketId) {
+            const result = await TicketsService.getById(ticketId);
+
+            if (!result.success) {
+                UIComponents.showError(result.error);
+                return;
+            }
+
+            currentTicket = result.ticket;
+            document.title = `${currentTicket.title} - Audaz Pro`;
+            document.getElementById('ticket-title').textContent = currentTicket.title;
+
+            // Calculate deadline
+            const deadline = calculateDeadline(currentTicket.created_at, currentTicket.priority);
+            const deadlineStatus = getDeadlineStatus(deadline);
+            const isCompleted = currentTicket.status === 'done';
+
+            // Render ticket info
+            const infoContainer = document.getElementById('ticket-info');
+            infoContainer.innerHTML = `
+                <div class="ticket-meta-row">
+                    ${UIComponents.createTypeBadge(currentTicket.type)}
+                    ${UIComponents.createPriorityBadge(currentTicket.priority)}
+                    ${UIComponents.createStatusBadge(currentTicket.status)}
+                </div>
+                <div class="ticket-description">
+                    <h3>Details${!isCompleted ? ` <span style="font-weight: normal; font-size: 0.85rem; color: rgba(255,255,255,0.6);">by ${formatDeadlineDate(deadline)}</span>` : ''}</h3>
+                    <p>${UIComponents.escapeHtml(currentTicket.description).replace(/\n/g, '<br>')}</p>
+                </div>
+                ${!isCompleted ? `
+                    <div class="expected-completion">
+                        <span class="field-label">Expected Response:</span>
+                        <span class="expected-completion-date">${formatDeadlineDate(deadline)}</span>
+                        <span class="expected-completion-status deadline-badge ${deadlineStatus.status}">${deadlineStatus.daysText}</span>
+                    </div>
+                ` : ''}
+                ${currentTicket.category ? `
+                    <div class="ticket-field">
+                        <span class="field-label">URL:</span>
+                        <span class="field-value">${UIComponents.escapeHtml(currentTicket.category)}</span>
+                    </div>
+                ` : ''}
+                ${renderAttachments(currentTicket)}
+                <div class="ticket-field">
+                    <span class="field-label">Created by:</span>
+                    <span class="field-value">${UIComponents.escapeHtml(currentTicket.creator?.full_name || 'Unknown')}</span>
+                </div>
+                <div class="ticket-field">
+                    <span class="field-label">Created on:</span>
+                    <span class="field-value">${UIComponents.formatDate(currentTicket.created_at, { relative: false })}</span>
+                </div>
+            `;
+
+            // Render status sidebar
+            const statusContainer = document.getElementById('ticket-status-info');
+            statusContainer.innerHTML = `
+                <div class="status-display">
+                    ${UIComponents.createStatusBadge(currentTicket.status)}
+                </div>
+                ${currentTicket.assignee ? `
+                    <div class="assignee-info">
+                        <span class="field-label">Assignee:</span>
+                        <span class="field-value">${UIComponents.escapeHtml(currentTicket.assignee.full_name)}</span>
+                    </div>
+                ` : `
+                    <div class="assignee-info">
+                        <span class="field-label">Assignee:</span>
+                        <span class="field-value muted">Unassigned</span>
+                    </div>
+                `}
+                <div class="last-update">
+                    <span class="field-label">Last activity:</span>
+                    <span class="field-value">${UIComponents.formatDate(currentTicket.last_activity_at)}</span>
+                </div>
+            `;
+
+            // Show/hide actions card based on ticket status and assignment
+            const actionsCard = document.getElementById('ticket-actions-card');
+            const assignedNoticeCard = document.getElementById('assigned-notice-card');
+            const cancelBtn = document.getElementById('cancel-ticket-btn');
+            const deleteBtn = document.getElementById('delete-ticket-btn');
+            const isClosed = currentTicket.status === 'done' || currentTicket.status === 'cancelled';
+            const isAssigned = currentTicket.assigned_to !== null;
+
+            // Client can only cancel/delete if ticket is NOT assigned yet
+            if (!isAssigned && !isClosed) {
+                // Not assigned and not closed - show both buttons
+                actionsCard.style.display = 'block';
+                assignedNoticeCard.style.display = 'none';
+                cancelBtn.style.display = 'flex';
+                deleteBtn.style.display = 'flex';
+            } else if (!isAssigned && isClosed) {
+                // Not assigned but closed - only show delete
+                actionsCard.style.display = 'block';
+                assignedNoticeCard.style.display = 'none';
+                cancelBtn.style.display = 'none';
+                deleteBtn.style.display = 'flex';
+            } else {
+                // Assigned - hide actions, show notice
+                actionsCard.style.display = 'none';
+                assignedNoticeCard.style.display = 'block';
+            }
+
+            // Setup action buttons
+            setupTicketActions();
+        }
+
+        function setupTicketActions() {
+            const cancelBtn = document.getElementById('cancel-ticket-btn');
+            const deleteBtn = document.getElementById('delete-ticket-btn');
+
+            cancelBtn?.addEventListener('click', handleCancelTicket);
+            deleteBtn?.addEventListener('click', handleDeleteTicket);
+        }
+
+        async function handleCancelTicket() {
+            const confirmed = confirm('Are you sure you want to cancel this ticket? This action cannot be undone.');
+            if (!confirmed) return;
+
+            const btn = document.getElementById('cancel-ticket-btn');
+            UIComponents.setButtonLoading(btn, true);
+
+            const result = await TicketsService.cancel(currentTicket.id);
+
+            if (result.success) {
+                UIComponents.showSuccess('Ticket cancelled successfully');
+                // Reload the ticket to update the UI
+                await loadTicket(currentTicket.id);
+                await loadTimeline(currentTicket.id);
+            } else {
+                UIComponents.showError(result.error || 'Failed to cancel ticket');
+            }
+
+            UIComponents.setButtonLoading(btn, false);
+        }
+
+        async function handleDeleteTicket() {
+            const confirmed = confirm('Are you sure you want to permanently delete this ticket? This action cannot be undone and all comments will be lost.');
+            if (!confirmed) return;
+
+            // Double confirm for delete
+            const doubleConfirm = confirm('This is your last chance. Delete this ticket permanently?');
+            if (!doubleConfirm) return;
+
+            const btn = document.getElementById('delete-ticket-btn');
+            UIComponents.setButtonLoading(btn, true);
+
+            const result = await TicketsService.delete(currentTicket.id);
+
+            if (result.success) {
+                UIComponents.showSuccess('Ticket deleted successfully');
+                // Redirect to tickets list
+                setTimeout(() => {
+                    window.location.href = '/client/tickets/index.html';
+                }, 1000);
+            } else {
+                UIComponents.showError(result.error || 'Failed to delete ticket');
+                UIComponents.setButtonLoading(btn, false);
+            }
+        }
+
+        async function loadOrganizationMembers(orgId) {
+            if (!orgId) {
+                mentionableUsers = [];
+                populateMentionPanel();
+                return;
+            }
+
+            const result = await TicketsService.getOrganizationMembers(orgId);
+            let members = [];
+
+            if (result.success) {
+                // Filter out the current user from mentionable list
+                members = (result.members || []).filter(m => m.id !== currentProfile?.id);
+            }
+
+            // Add the assigned support agent if exists
+            if (currentTicket?.assignee) {
+                const assignee = currentTicket.assignee;
+                // Check if assignee is not already in the list
+                if (!members.some(m => m.id === assignee.id)) {
+                    members.unshift({
+                        id: assignee.id,
+                        full_name: assignee.full_name,
+                        role: 'Support'
+                    });
+                }
+            }
+
+            mentionableUsers = members;
+            populateMentionPanel();
+        }
+
+        async function loadCollaborators(ticketId) {
+            const container = document.getElementById('collaborators-container');
+            const result = await CollaboratorsService.getByTicketId(ticketId);
+
+            if (!result.success) {
+                container.innerHTML = '<p class="error-message">Error loading collaborators</p>';
+                return;
+            }
+
+            ticketCollaborators = result.collaborators || [];
+
+            // Get available users (org members not already collaborators, excluding current user)
+            const collaboratorIds = new Set(ticketCollaborators.map(c => c.user_id));
+            const availableUsers = mentionableUsers
+                .filter(u => !collaboratorIds.has(u.id) && u.id !== currentProfile?.id)
+                .map(u => ({ ...u, group: 'Team Members' }));
+
+            container.innerHTML = UIComponents.createCollaboratorsCard(ticketCollaborators, {
+                canAdd: true,
+                canRemove: true,
+                availableUsers
+            });
+
+            setupCollaboratorActions();
+        }
+
+        function setupCollaboratorActions() {
+            // Add collaborator
+            const addBtn = document.getElementById('add-collaborator-btn');
+            if (addBtn) {
+                addBtn.addEventListener('click', async () => {
+                    const select = document.getElementById('add-collaborator-select');
+                    const userId = select.value;
+                    if (!userId) {
+                        UIComponents.showWarning('Please select a user');
+                        return;
+                    }
+
+                    UIComponents.setButtonLoading(addBtn, true);
+                    const result = await CollaboratorsService.add(currentTicket.id, userId);
+
+                    if (result.success) {
+                        UIComponents.showSuccess('Collaborator added');
+                        await loadCollaborators(currentTicket.id);
+                    } else {
+                        UIComponents.showError(result.error);
+                    }
+
+                    UIComponents.setButtonLoading(addBtn, false);
+                });
+            }
+
+            // Remove collaborator
+            document.querySelectorAll('.collaborator-remove').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const userId = e.currentTarget.dataset.userId;
+                    if (!confirm('Remove this collaborator? They will no longer receive notifications.')) {
+                        return;
+                    }
+
+                    const result = await CollaboratorsService.remove(currentTicket.id, userId);
+
+                    if (result.success) {
+                        UIComponents.showSuccess('Collaborator removed');
+                        await loadCollaborators(currentTicket.id);
+                    } else {
+                        UIComponents.showError(result.error);
+                    }
+                });
+            });
+        }
+
+        async function loadComments(ticketId) {
+            const container = document.getElementById('comments-thread');
+            const result = await CommentsService.getByTicketId(ticketId);
+
+            if (!result.success) {
+                container.innerHTML = '<p class="error-message">Error loading comments</p>';
+                return;
+            }
+
+            if (result.comments.length === 0) {
+                container.innerHTML = '<p class="no-comments">No comments yet. Be the first to comment!</p>';
+                return;
+            }
+
+            container.innerHTML = result.comments
+                .map(comment => UIComponents.createCommentItem(comment, {
+                    context: { mentionableUsers }
+                }))
+                .join('');
+        }
+
+        let allTimelineEvents = [];
+        let timelineDisplayCount = 4;
+
+        async function loadTimeline(ticketId) {
+            const container = document.getElementById('ticket-timeline');
+            const result = await CommentsService.getEventsByTicketId(ticketId);
+
+            if (!result.success) {
+                container.innerHTML = '<p class="error-message">Error loading history</p>';
+                return;
+            }
+
+            if (result.events.length === 0) {
+                container.innerHTML = '<p class="no-events">No events recorded</p>';
+                return;
+            }
+
+            // Sort events by date (newest first)
+            allTimelineEvents = [...result.events].sort((a, b) =>
+                new Date(b.created_at) - new Date(a.created_at)
+            );
+
+            // Reset display count
+            timelineDisplayCount = 4;
+            renderTimeline();
+        }
+
+        function renderTimeline() {
+            const container = document.getElementById('ticket-timeline');
+            const eventsToShow = allTimelineEvents.slice(0, timelineDisplayCount);
+            const hasMore = allTimelineEvents.length > timelineDisplayCount;
+
+            let html = eventsToShow
+                .map(event => UIComponents.createTimelineEvent(event))
+                .join('');
+
+            if (hasMore) {
+                const remaining = allTimelineEvents.length - timelineDisplayCount;
+                html += `
+                    <button type="button" class="timeline-load-more" id="timeline-load-more">
+                        Show more (${remaining} more)
+                    </button>
+                `;
+            }
+
+            container.innerHTML = html;
+
+            // Setup load more button
+            const loadMoreBtn = document.getElementById('timeline-load-more');
+            if (loadMoreBtn) {
+                loadMoreBtn.addEventListener('click', () => {
+                    timelineDisplayCount += 4;
+                    renderTimeline();
+                });
+            }
+        }
+
+        async function uploadCommentAttachments(ticketId) {
+            if (pendingAttachments.length === 0) {
+                return { attachments: [], failedUploads: [] };
+            }
+
+            const supabaseClient = AudazSupabase.getClient();
+            if (!supabaseClient?.storage) {
+                console.error('Supabase storage client not available');
+                return { attachments: [], failedUploads: pendingAttachments.map(f => ({ name: f.name, error: 'Storage not available' })) };
+            }
+
+            const uploadedUrls = [];
+            const failedUploads = [];
+
+            for (const attachment of pendingAttachments) {
+                const file = attachment.file;
+                if (!file) {
+                    failedUploads.push({ name: attachment.name, error: 'No file data' });
+                    continue;
+                }
+
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${ticketId}/comments/${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
+
+                try {
+                    console.log(`Uploading file: ${fileName}`);
+                    const { data: uploadData, error: uploadError } = await supabaseClient.storage
+                        .from('ticket-attachments')
+                        .upload(fileName, file);
+
+                    if (uploadError) {
+                        console.error('Upload error:', uploadError);
+                        failedUploads.push({ name: file.name, error: uploadError.message });
+                        continue;
+                    }
+
+                    const { data: urlData } = supabaseClient.storage
+                        .from('ticket-attachments')
+                        .getPublicUrl(fileName);
+
+                    if (urlData?.publicUrl) {
+                        uploadedUrls.push({
+                            name: file.name,
+                            url: urlData.publicUrl,
+                            type: file.type,
+                            size: file.size
+                        });
+                        console.log(`Upload successful: ${urlData.publicUrl}`);
+                    } else {
+                        failedUploads.push({ name: file.name, error: 'Could not get public URL' });
+                    }
+                } catch (e) {
+                    console.error('Upload exception:', e);
+                    failedUploads.push({ name: file.name, error: e.message });
+                }
+            }
+
+            return { attachments: uploadedUrls, failedUploads };
+        }
+
+        async function handleCommentSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const btn = form.querySelector('button[type="submit"]');
+            const rawBody = (form.body.value || '').trim();
+            const hasText = Boolean(rawBody);
+            const hasAttachments = pendingAttachments.length > 0;
+
+            if (!hasText && !hasAttachments) {
+                UIComponents.showError('Please write a comment or add an attachment');
+                return;
+            }
+
+            UIComponents.setButtonLoading(btn, true);
+
+            let finalBody = rawBody;
+
+            // Upload attachments first if any
+            if (hasAttachments) {
+                try {
+                    const uploadResult = await uploadCommentAttachments(currentTicket.id);
+
+                    if (uploadResult.failedUploads.length > 0) {
+                        const failedNames = uploadResult.failedUploads.map(f => f.name).join(', ');
+                        console.error('Failed uploads:', uploadResult.failedUploads);
+                        UIComponents.showError(`Failed to upload: ${failedNames}`);
+                    }
+
+                    // Add successfully uploaded attachments to comment body
+                    if (uploadResult.attachments.length > 0) {
+                        const attachmentLines = uploadResult.attachments
+                            .map(att => `📎 [${att.name}](${att.url}) (${formatFileSize(att.size)})`)
+                            .join('\n');
+                        finalBody = rawBody ? `${rawBody}\n\n${attachmentLines}` : attachmentLines;
+                    }
+                } catch (uploadError) {
+                    console.error('Comment attachment upload error:', uploadError);
+                    UIComponents.showError('Failed to upload attachments. Please try again.');
+                    UIComponents.setButtonLoading(btn, false);
+                    return;
+                }
+            }
+
+            const result = await CommentsService.add(currentTicket.id, finalBody);
+
+            if (result.success) {
+                UIComponents.showSuccess('Comment added!');
+                form.reset();
+                pendingAttachments = [];
+                if (attachmentInputElement) {
+                    attachmentInputElement.value = '';
+                }
+                renderAttachmentPreview();
+                updateNotificationText();
+                closeMentionPanel();
+                closeEmojiPanel();
+                await loadComments(currentTicket.id);
+                await loadCollaborators(currentTicket.id); // Reload collaborators (mentions may add new ones)
+                await loadTimeline(currentTicket.id);
+            } else {
+                UIComponents.showError(result.error);
+            }
+
+            UIComponents.setButtonLoading(btn, false);
+        }
+
+
+        function setupCommentComposer(profile) {
+            const avatar = document.getElementById('composer-avatar');
+            if (avatar && profile) {
+                avatar.textContent = UIComponents.getInitials(profile.full_name);
+            }
+
+            const form = document.getElementById('comment-form');
+            commentEditor = document.getElementById('comment-body');
+            mentionPanelElement = document.getElementById('mention-panel');
+            emojiPanelElement = document.getElementById('emoji-panel');
+            attachmentsPreviewElement = document.getElementById('attachment-preview');
+            attachmentInputElement = document.getElementById('attachment-input');
+
+            form?.addEventListener('submit', handleCommentSubmit);
+            commentEditor?.addEventListener('input', updateNotificationText);
+            attachmentInputElement?.addEventListener('change', handleFileSelection);
+
+            // Open mention panel when user types @
+            commentEditor?.addEventListener('input', (e) => {
+                const value = e.target.value;
+                const cursorPos = e.target.selectionStart;
+                // Check if user just typed @ (the character before cursor is @)
+                if (cursorPos > 0 && value[cursorPos - 1] === '@') {
+                    mentionPanelElement?.classList.add('is-open');
+                }
+            });
+
+            // Handle paste event for images
+            commentEditor?.addEventListener('paste', (e) => {
+                const items = e.clipboardData?.items;
+                if (!items) return;
+
+                for (const item of items) {
+                    if (item.type.startsWith('image/')) {
+                        e.preventDefault();
+                        const file = item.getAsFile();
+                        if (file) {
+                            // Generate a name for the pasted image
+                            const extension = file.type.split('/')[1] || 'png';
+                            const fileName = `pasted-image-${Date.now()}.${extension}`;
+
+                            pendingAttachments.push({
+                                id: `${Date.now()}-${Math.random()}`,
+                                name: fileName,
+                                size: file.size,
+                                type: file.type,
+                                file: new File([file], fileName, { type: file.type })
+                            });
+
+                            renderAttachmentPreview();
+                            updateNotificationText();
+                            UIComponents.showSuccess('Image pasted');
+                        }
+                        break;
+                    }
+                }
+            });
+
+            document.querySelector('[data-action="attach-file"]')?.addEventListener('click', () => {
+                attachmentInputElement?.click();
+            });
+
+            document.querySelector('[data-action="mention"]')?.addEventListener('click', () => {
+                mentionPanelElement?.classList.toggle('is-open');
+            });
+
+            document.querySelector('[data-action="emoji"]')?.addEventListener('click', () => {
+                const opened = emojiPanelElement?.classList.toggle('is-open');
+                if (opened) {
+                    populateEmojiPanel();
+                }
+            });
+
+            attachmentsPreviewElement?.addEventListener('click', event => {
+                const removeButton = event.target.closest('.chip-remove');
+                if (!removeButton) return;
+                const index = Number(removeButton.dataset.index);
+                if (!Number.isNaN(index)) {
+                    pendingAttachments.splice(index, 1);
+                    renderAttachmentPreview();
+                    updateNotificationText();
+                }
+            });
+
+            if (mentionPanelElement) {
+                mentionPanelElement.addEventListener('click', event => {
+                    const item = event.target.closest('.mention-item');
+                    if (!item) return;
+                    insertMention({
+                        id: item.dataset.userId,
+                        full_name: item.dataset.userName
+                    });
+                    mentionPanelElement.classList.remove('is-open');
+                });
+            }
+
+            document.addEventListener('click', event => {
+                if (mentionPanelElement && !event.target.closest('.mention-panel') && !event.target.closest('[data-action="mention"]')) {
+                    mentionPanelElement.classList.remove('is-open');
+                }
+                if (emojiPanelElement && !event.target.closest('.emoji-panel') && !event.target.closest('[data-action="emoji"]')) {
+                    emojiPanelElement.classList.remove('is-open');
+                }
+            });
+
+            populateEmojiPanel();
+            updateNotificationText();
+            renderAttachmentPreview();
+            populateMentionPanel();
+        }
+
+        function handleFileSelection(event) {
+            const files = Array.from(event.target.files || []);
+            files.forEach(file => {
+                pendingAttachments.push({
+                    id: `${Date.now()}-${Math.random()}`,
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    file
+                });
+            });
+            if (attachmentInputElement) {
+                attachmentInputElement.value = '';
+            }
+            renderAttachmentPreview();
+            updateNotificationText();
+        }
+
+        function updateNotificationText() {
+            if (!commentEditor) return;
+            const matches = commentEditor.value.match(/@\[[^\]]+\]/g) || [];
+            const uniqueCount = new Set(matches).size;
+            const notificationEl = document.getElementById('comment-notification-text');
+            if (!notificationEl) return;
+            const parts = [];
+            parts.push(`${uniqueCount} ${uniqueCount === 1 ? 'person will be' : 'people will be'} notified`);
+            if (pendingAttachments.length) {
+                parts.push(`${pendingAttachments.length} ${pendingAttachments.length === 1 ? 'attachment' : 'attachments'}`);
+            }
+            notificationEl.textContent = parts.join(' • ');
+        }
+
+        function insertMention(user) {
+            if (!commentEditor || !user) return;
+
+            // Check if there's already an @ before cursor and remove it
+            const cursorPos = commentEditor.selectionStart || 0;
+            const value = commentEditor.value || '';
+
+            if (cursorPos > 0 && value[cursorPos - 1] === '@') {
+                // Remove the @ that was typed
+                commentEditor.value = value.slice(0, cursorPos - 1) + value.slice(cursorPos);
+                commentEditor.setSelectionRange(cursorPos - 1, cursorPos - 1);
+            }
+
+            const mentionToken = `@${user.full_name} `;
+            insertAtCursor(commentEditor, mentionToken);
+            commentEditor.focus();
+            updateNotificationText();
+        }
+
+        function insertAtCursor(textarea, text) {
+            if (!textarea) return;
+            const start = textarea.selectionStart || 0;
+            const end = textarea.selectionEnd || 0;
+            const value = textarea.value || '';
+            textarea.value = `${value.slice(0, start)}${text}${value.slice(end)}`;
+            const cursor = start + text.length;
+            textarea.setSelectionRange(cursor, cursor);
+            textarea.dispatchEvent(new Event('input'));
+        }
+
+        function renderAttachmentPreview() {
+            if (!attachmentsPreviewElement) return;
+            attachmentsPreviewElement.innerHTML = pendingAttachments
+                .map((file, index) => `
+                    <span class="attachment-chip">
+                        <span class="chip-text">${UIComponents.escapeHtml(file.name)}</span>
+                        <span class="chip-size">${formatFileSize(file.size)}</span>
+                        <button type="button" class="chip-remove" data-index="${index}" aria-label="Remove attachment">×</button>
+                    </span>
+                `)
+                .join('');
+        }
+
+        function formatFileSize(bytes) {
+            if (!bytes || bytes === 0) return '0 B';
+            const units = ['B', 'KB', 'MB', 'GB'];
+            const exponent = Math.min(units.length - 1, Math.floor(Math.log(bytes) / Math.log(1024)));
+            const value = bytes / Math.pow(1024, exponent);
+            return `${value.toFixed(1)} ${units[exponent]}`;
+        }
+
+        function populateMentionPanel() {
+            if (!mentionPanelElement) return;
+            if (!mentionableUsers.length) {
+                mentionPanelElement.innerHTML = '<p class="mention-empty">No members available</p>';
+                return;
+            }
+
+            mentionPanelElement.innerHTML = mentionableUsers
+                .map(user => `
+                    <div class="mention-item" data-user-id="${user.id}" data-user-name="${UIComponents.escapeHtml(user.full_name)}">
+                        <div class="mention-avatar">${UIComponents.getInitials(user.full_name)}</div>
+                        <div>
+                            <div class="mention-name">${UIComponents.escapeHtml(user.full_name)}</div>
+                            <div class="mention-role">${UIComponents.escapeHtml(user.role || 'Colaborador')}</div>
+                        </div>
+                    </div>
+                `)
+                .join('');
+        }
+
+        function populateEmojiPanel() {
+            if (!emojiPanelElement) return;
+            emojiPanelElement.innerHTML = EMOJI_LIST
+                .map(emoji => `<button type="button" class="emoji-item" data-emoji="${emoji}" aria-label="${emoji}">${emoji}</button>`)
+                .join('');
+
+            emojiPanelElement.querySelectorAll('.emoji-item').forEach(button => {
+                button.addEventListener('click', () => {
+                    insertAtCursor(commentEditor, `${button.dataset.emoji} `);
+                    closeEmojiPanel();
+                    commentEditor?.focus();
+                    updateNotificationText();
+                });
+            });
+        }
+
+        function closeMentionPanel() {
+            if (mentionPanelElement) {
+                mentionPanelElement.classList.remove('is-open');
+            }
+        }
+
+        function closeEmojiPanel() {
+            if (emojiPanelElement) {
+                emojiPanelElement.classList.remove('is-open');
+            }
+        }
+
+        function renderAttachments(ticket) {
+            // Check for attachments array (new format)
+            if (ticket.attachments && Array.isArray(ticket.attachments) && ticket.attachments.length > 0) {
+                return `
+                    <div class="ticket-attachments">
+                        <h3>Attachments</h3>
+                        <div class="attachments-grid">
+                            ${ticket.attachments.map(att => renderAttachmentItem(att)).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Fallback to single attachment_url (old format)
+            if (ticket.attachment_url) {
+                return `
+                    <div class="ticket-attachments">
+                        <h3>Attachments</h3>
+                        <div class="attachments-grid">
+                            <a href="${ticket.attachment_url}" target="_blank" class="attachment-item attachment-link">
+                                <div class="attachment-icon other">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                                    </svg>
+                                </div>
+                                <span class="attachment-name">View Attachment</span>
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }
+
+            return '';
+        }
+
+        function renderAttachmentItem(attachment) {
+            const type = attachment.type || 'other';
+            const name = attachment.name || 'Attachment';
+            const url = attachment.url || '';
+            const size = attachment.size ? formatAttachmentSize(attachment.size) : '';
+
+            // Check if it's an image for preview
+            const isImage = type === 'image' || /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(name);
+            const isVideo = type === 'video' || /\.(mp4|webm|mov|avi)$/i.test(name);
+            const isPdf = type === 'pdf' || /\.pdf$/i.test(name);
+
+            let iconClass = 'other';
+            let iconContent = '';
+
+            if (isImage) {
+                iconClass = 'image';
+                iconContent = `<img src="${url}" alt="${UIComponents.escapeHtml(name)}" class="attachment-preview-img">`;
+            } else if (isVideo) {
+                iconClass = 'video';
+                iconContent = `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                        <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                `;
+            } else if (isPdf) {
+                iconClass = 'pdf';
+                iconContent = 'PDF';
+            } else {
+                iconClass = 'document';
+                iconContent = getExtension(name);
+            }
+
+            return `
+                <a href="${url}" target="_blank" class="attachment-item" title="${UIComponents.escapeHtml(name)}">
+                    <div class="attachment-icon ${iconClass}">${iconContent}</div>
+                    <div class="attachment-info">
+                        <span class="attachment-name">${UIComponents.escapeHtml(name)}</span>
+                        ${size ? `<span class="attachment-size">${size}</span>` : ''}
+                    </div>
+                    <div class="attachment-download">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                    </div>
+                </a>
+            `;
+        }
+
+        function getExtension(filename) {
+            const ext = filename.split('.').pop();
+            return ext ? ext.toUpperCase().substring(0, 4) : 'FILE';
+        }
+
+        function formatAttachmentSize(bytes) {
+            if (!bytes || bytes === 0) return '';
+            const units = ['B', 'KB', 'MB', 'GB'];
+            const exponent = Math.min(units.length - 1, Math.floor(Math.log(bytes) / Math.log(1024)));
+            const value = bytes / Math.pow(1024, exponent);
+            return `${value.toFixed(1)} ${units[exponent]}`;
+        }
+    </script>
+</body>
+</html>

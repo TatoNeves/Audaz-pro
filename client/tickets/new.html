@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Ticket - Audaz Pro</title>
+    <meta name="description" content="Open a new Audaz Pro ticket">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/tickets.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../../images/favicon-32x32.png">
+</head>
+<body class="audaz-body">
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container">
+            <div class="header-grid">
+                <a href="/client/dashboard.html" class="logo-link">
+                    <img src="../../images/66943b1c1348ffa2b811c19c_Audaz Black.png" alt="Audaz Pro" class="logo-image">
+                </a>
+                <nav class="nav">
+                    <ul class="nav-menu">
+                        <li><a href="/client/dashboard.html" class="nav-link">Dashboard</a></li>
+                        <li><a href="/client/tickets/index.html" class="nav-link active">Tickets</a></li>
+                        <li><a href="/client/settings/team.html" class="nav-link">Team</a></li>
+                    </ul>
+                    <div class="user-menu">
+                        <div class="user-avatar"></div>
+                        <span class="user-name">Loading...</span>
+                        <button class="logout-btn btn btn-secondary">Log Out</button>
+                    </div>
+                </nav>
+                <button class="mobile-toggle" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Page Header -->
+        <section class="dashboard-header">
+            <div class="container">
+                <div class="dashboard-header-content">
+                    <div class="dashboard-welcome">
+                        <a href="/client/tickets/index.html" class="back-link">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                                <path d="M19 12H5M12 19l-7-7 7-7"/>
+                            </svg>
+                            Back
+                        </a>
+                        <h1>New Ticket</h1>
+                        <p>Fill out the form below to open a new ticket</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Disclaimer Section -->
+        <section class="disclaimer-section">
+            <div class="container">
+                <div class="disclaimer-card">
+                    <div class="disclaimer-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="16" x2="12" y2="12"/>
+                            <line x1="12" y1="8" x2="12.01" y2="8"/>
+                        </svg>
+                        <h3>Before You Submit</h3>
+                    </div>
+                    <p class="disclaimer-intro">Please complete this form by providing as much information as you can.</p>
+                    <p class="disclaimer-text">Screenshots, videos, or any additional details you can provide are incredibly helpful for us to understand and resolve your issue promptly.</p>
+
+                    <div class="response-times">
+                        <h4>Response Time</h4>
+                        <p class="response-intro">Please be aware that how fast we respond to your website update requests depends on how urgent your request is:</p>
+                        <ul class="response-list">
+                            <li><span class="priority-label urgent">Urgent</span> We'll get back to you in up to <strong>48 hours</strong>.</li>
+                            <li><span class="priority-label high">High Priority</span> We'll respond in up to <strong>72 hours</strong>.</li>
+                            <li><span class="priority-label normal">Normal Priority</span> We'll take care of your request within <strong>7 days</strong>.</li>
+                            <li><span class="priority-label low">Low Priority</span> We'll respond within <strong>14 days</strong>.</li>
+                        </ul>
+                    </div>
+
+                    <p class="disclaimer-thanks">Thanks for your patience. We'll work hard to handle your request fast and well, based on how urgent it is.</p>
+
+                    <div class="disclaimer-note">
+                        <strong>More About the Update Process:</strong> If your request is big or complicated and takes more time, we'll make sure to contact you. We'll keep you updated on how things are going and let you know if we need more time.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Ticket Form -->
+        <section class="form-section">
+            <div class="container">
+                <form id="ticket-form" class="ticket-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="ticket-type">Request Type *</label>
+                            <select id="ticket-type" name="type" required>
+                                <option value="">Select...</option>
+                                <option value="alteracao">Change Request</option>
+                                <option value="suporte">Support</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ticket-priority">Priority *</label>
+                            <select id="ticket-priority" name="priority" required>
+                                <option value="">Select...</option>
+                                <option value="baixa">Low (14 days)</option>
+                                <option value="media">Normal (7 days)</option>
+                                <option value="alta">High (72 hours)</option>
+                                <option value="urgente">Urgent (48 hours)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ticket-title">Title *</label>
+                        <input type="text" id="ticket-title" name="title" required placeholder="Brief summary of the issue or request" maxlength="200">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ticket-description">Description *</label>
+                        <textarea id="ticket-description" name="description" required placeholder="Describe the issue or desired change in detail..." rows="8"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ticket-category">Website URL</label>
+                        <input type="text" id="ticket-category" name="category" placeholder="E.g., https://audaz.com/checkout" aria-describedby="ticket-category-hint">
+                        <small id="ticket-category-hint" class="form-hint">Optional: paste the URL of the page you want us to update.</small>
+                    </div>
+
+                    <!-- File Upload Section -->
+                    <div class="form-group">
+                        <label>Attachments (optional)</label>
+                        <div class="file-upload-area" id="file-upload-area">
+                            <input type="file" id="file-input" multiple accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar" hidden>
+                            <div class="upload-placeholder">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="17 8 12 3 7 8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                                <p>Drag files here or <span class="upload-link">browse</span></p>
+                                <small>Images, videos, PDF, Word, Excel (max 10MB each)</small>
+                            </div>
+                        </div>
+                        <div class="uploaded-files" id="uploaded-files"></div>
+                        <small class="form-hint">You can upload images, documents and videos up to 10MB each.</small>
+                    </div>
+
+                    <!-- Monthly Usage Indicator -->
+                    <div class="usage-indicator" id="usage-indicator" style="display: none;">
+                        <div class="usage-indicator-header">
+                            <span class="usage-indicator-title">Monthly Requests</span>
+                            <span class="usage-indicator-value" id="usage-value">0 / 10</span>
+                        </div>
+                        <div class="usage-indicator-bar">
+                            <div class="usage-indicator-fill" id="usage-fill" style="width: 0%"></div>
+                        </div>
+                        <span class="usage-indicator-hint" id="usage-hint">You have 10 requests remaining this month</span>
+                    </div>
+
+                    <div class="form-info-box">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="16" x2="12" y2="12"/>
+                            <line x1="12" y1="8" x2="12.01" y2="8"/>
+                        </svg>
+                        <p>The ticket will be created with status <strong>Open</strong> and our team will reach out shortly.</p>
+                    </div>
+
+                    <!-- Limit Reached Warning -->
+                    <div class="limit-reached-warning" id="limit-warning" style="display: none;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/>
+                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                        <div>
+                            <h4>Monthly Limit Reached</h4>
+                            <p>Your organization has reached the monthly request limit. Please contact support to upgrade your plan or wait until next month.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <a href="/client/tickets/index.html" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Create Ticket</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer site-footer-app">
+        <div class="container">
+            <div class="footer-bottom">
+                <img src="../../images/66943b1c1348ffa2b811c19c_Audaz Black.png" alt="Audaz Pro" class="footer-logo-img">
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../js/supabase-config.js"></script>
+    <script src="../../js/services/auth.service.js"></script>
+    <script src="../../js/services/tickets.service.js"></script>
+    <script src="../../js/services/comments.service.js"></script>
+    <script src="../../js/services/invitations.service.js"></script>
+    <script src="../../js/components/ui.components.js"></script>
+    <script src="../../js/components/auth-guard.js"></script>
+    <script>
+        // File upload state
+        let uploadedFiles = [];
+        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+        const ALLOWED_TYPES = {
+            image: ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'],
+            video: ['video/mp4', 'video/webm', 'video/quicktime', 'video/avi'],
+            document: [
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/vnd.ms-powerpoint',
+                'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                'text/plain',
+                'application/zip',
+                'application/x-rar-compressed'
+            ]
+        };
+
+        let currentProfile = null;
+        let canCreateTicket = true;
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Auth guard
+            currentProfile = await AuthGuard.init({
+                requiredRoles: ['client_admin', 'client_user'],
+                redirectTo: '/client/index.html'
+            });
+
+            if (!currentProfile) return;
+
+            // Update UI
+            AuthGuard.updateUserInfo(currentProfile);
+            AuthGuard.setupLogoutButton();
+
+            // Mobile menu
+            const mobileToggle = document.querySelector('.mobile-toggle');
+            const nav = document.querySelector('.nav');
+            if (mobileToggle && nav) {
+                mobileToggle.addEventListener('click', () => nav.classList.toggle('active'));
+            }
+
+            // Check monthly usage
+            await checkMonthlyUsage();
+
+            // File upload setup
+            setupFileUpload();
+
+            // Form submission
+            document.getElementById('ticket-form').addEventListener('submit', handleSubmit);
+        });
+
+        async function checkMonthlyUsage() {
+            if (!currentProfile?.org_id) return;
+
+            const result = await TicketsService.getMonthlyUsage(currentProfile.org_id);
+
+            if (result.success) {
+                const { limit, used, remaining } = result.usage;
+                const percent = limit > 0 ? Math.min((used / limit) * 100, 100) : 0;
+
+                // Show usage indicator
+                const indicator = document.getElementById('usage-indicator');
+                const valueEl = document.getElementById('usage-value');
+                const fillEl = document.getElementById('usage-fill');
+                const hintEl = document.getElementById('usage-hint');
+
+                indicator.style.display = 'flex';
+                valueEl.textContent = `${used} / ${limit}`;
+                fillEl.style.width = `${percent}%`;
+
+                // Update color based on usage
+                if (percent >= 90) {
+                    fillEl.classList.add('critical');
+                    valueEl.style.color = '#ef4444';
+                } else if (percent >= 70) {
+                    fillEl.classList.add('warning');
+                    valueEl.style.color = '#f59e0b';
+                }
+
+                if (remaining > 0) {
+                    hintEl.textContent = `You have ${remaining} request${remaining !== 1 ? 's' : ''} remaining this month`;
+                } else {
+                    hintEl.textContent = 'You have reached your monthly limit';
+                    hintEl.style.color = '#ef4444';
+                }
+
+                // Check if can create ticket
+                if (remaining <= 0) {
+                    canCreateTicket = false;
+                    showLimitReachedWarning();
+                }
+            }
+        }
+
+        function showLimitReachedWarning() {
+            // Show warning
+            document.getElementById('limit-warning').style.display = 'flex';
+
+            // Disable form
+            const form = document.getElementById('ticket-form');
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Limit Reached';
+
+            // Disable all form inputs
+            form.querySelectorAll('input, select, textarea').forEach(el => {
+                el.disabled = true;
+            });
+        }
+
+        function setupFileUpload() {
+            const uploadArea = document.getElementById('file-upload-area');
+            const fileInput = document.getElementById('file-input');
+
+            // Click to browse
+            uploadArea.addEventListener('click', () => fileInput.click());
+
+            // File input change
+            fileInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+                fileInput.value = ''; // Reset input
+            });
+
+            // Drag and drop
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                handleFiles(e.dataTransfer.files);
+            });
+        }
+
+        function handleFiles(files) {
+            for (const file of files) {
+                // Check file size
+                if (file.size > MAX_FILE_SIZE) {
+                    UIComponents.showError(`File "${file.name}" exceeds 10MB limit.`);
+                    continue;
+                }
+
+                // Check file type
+                const fileType = getFileType(file);
+                if (!fileType) {
+                    UIComponents.showError(`File type not supported: "${file.name}"`);
+                    continue;
+                }
+
+                // Check for duplicates
+                if (uploadedFiles.some(f => f.name === file.name && f.size === file.size)) {
+                    UIComponents.showError(`File "${file.name}" already added.`);
+                    continue;
+                }
+
+                // Add file to list
+                uploadedFiles.push(file);
+                renderUploadedFiles();
+            }
+        }
+
+        function getFileType(file) {
+            if (ALLOWED_TYPES.image.includes(file.type)) return 'image';
+            if (ALLOWED_TYPES.video.includes(file.type)) return 'video';
+            if (ALLOWED_TYPES.document.includes(file.type)) return 'document';
+            if (file.type === 'application/pdf') return 'pdf';
+            return null;
+        }
+
+        function getFileExtension(filename) {
+            return filename.split('.').pop().toUpperCase();
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function renderUploadedFiles() {
+            const container = document.getElementById('uploaded-files');
+            container.innerHTML = '';
+
+            uploadedFiles.forEach((file, index) => {
+                const fileType = getFileType(file);
+                const item = document.createElement('div');
+                item.className = 'uploaded-file-item';
+
+                // Create preview for images
+                let iconContent = '';
+                if (fileType === 'image') {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = item.querySelector('.file-icon img');
+                        if (img) img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                    iconContent = '<img src="" alt="preview">';
+                } else {
+                    iconContent = getFileExtension(file.name);
+                }
+
+                item.innerHTML = `
+                    <div class="file-icon ${fileType}">${iconContent}</div>
+                    <div class="file-info">
+                        <span class="file-name" title="${file.name}">${file.name}</span>
+                        <span class="file-size">${formatFileSize(file.size)}</span>
+                    </div>
+                    <button type="button" class="file-remove" data-index="${index}" title="Remove file">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                `;
+
+                // Remove button handler
+                item.querySelector('.file-remove').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    uploadedFiles.splice(index, 1);
+                    renderUploadedFiles();
+                });
+
+                container.appendChild(item);
+            });
+        }
+
+        async function uploadFilesToStorage(ticketId, storageClient) {
+            if (uploadedFiles.length === 0) {
+                return { attachments: [], failedUploads: [] };
+            }
+
+            const uploadedUrls = [];
+            const failedUploads = [];
+
+            const storageApi = storageClient?.storage || window.supabase?.storage;
+
+            if (!storageApi) {
+                const msg = 'Supabase storage client is not available';
+                console.warn(msg);
+                throw new Error(msg);
+            }
+
+            for (const file of uploadedFiles) {
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${ticketId}/${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
+
+                const { data: uploadData, error: uploadError } = await storageApi
+                    .from('ticket-attachments')
+                    .upload(fileName, file);
+
+                if (uploadError) {
+                    console.error('Upload error:', uploadError);
+                    failedUploads.push({ name: file.name, error: uploadError });
+                    continue;
+                }
+
+                // Get public URL
+                const { data: urlData, error: urlError } = storageApi
+                    .from('ticket-attachments')
+                    .getPublicUrl(fileName);
+
+                if (urlError) {
+                    console.error('Get public URL error:', urlError);
+                    failedUploads.push({ name: file.name, error: urlError });
+                    continue;
+                }
+
+                if (urlData?.publicUrl) {
+                    uploadedUrls.push({
+                        name: file.name,
+                        url: urlData.publicUrl,
+                        type: getFileType(file),
+                        size: file.size
+                    });
+                } else {
+                    failedUploads.push({
+                        name: file.name,
+                        error: new Error('Public URL missing')
+                    });
+                }
+            }
+
+            return {
+                attachments: uploadedUrls,
+                failedUploads
+            };
+        }
+
+        async function handleSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const btn = form.querySelector('button[type="submit"]');
+
+            // Check limit again before submitting
+            if (!canCreateTicket) {
+                UIComponents.showError('Monthly request limit reached. Please contact support.');
+                return;
+            }
+
+            const ticketData = {
+                type: form.type.value,
+                title: form.title.value,
+                description: form.description.value,
+                priority: form.priority.value,
+                category: form.category.value || null
+            };
+
+            // Validation
+            if (!ticketData.type || !ticketData.title || !ticketData.description || !ticketData.priority) {
+                UIComponents.showError('Please fill in all required fields.');
+                return;
+            }
+
+            const supabaseClient = AudazSupabase.getClient();
+            if (!supabaseClient) {
+                UIComponents.showError('Supabase is not configured. Please try again later.');
+                return;
+            }
+
+            UIComponents.setButtonLoading(btn, true);
+
+            // Create ticket first
+            const result = await TicketsService.create(ticketData);
+
+            if (result.success) {
+                let uploadSuccess = true;
+                let uploadErrorMessage = null;
+
+                // Upload files if any
+                if (uploadedFiles.length > 0) {
+                    try {
+                        console.log('Starting file upload for ticket:', result.ticketId);
+                        const uploadResult = await uploadFilesToStorage(result.ticketId, supabaseClient);
+                        console.log('Upload result:', uploadResult);
+
+                        if (uploadResult.attachments.length > 0) {
+                            console.log('Updating ticket with attachment URL...');
+                            const { error: updateError } = await supabaseClient
+                                .from('tickets')
+                                .update({
+                                    attachment_url: uploadResult.attachments[0]?.url || null
+                                })
+                                .eq('id', result.ticketId);
+
+                            if (updateError) {
+                                console.error('Attachment reference update failed:', updateError);
+                                uploadErrorMessage = 'Ticket created, but failed to save attachment reference.';
+                            } else {
+                                console.log('Attachment URL saved successfully');
+                            }
+                        }
+
+                        if (uploadResult.failedUploads.length > 0) {
+                            uploadSuccess = false;
+                            const failedList = uploadResult.failedUploads.map(f => f.name);
+                            console.error('Failed uploads:', uploadResult.failedUploads);
+                            const summary = failedList.slice(0, 2).join(', ');
+                            const suffix = failedList.length > 2 ? ` and ${failedList.length - 2} more` : '';
+                            uploadErrorMessage = `Failed to upload: ${summary}${suffix}. Check console for details.`;
+                        }
+                    } catch (uploadError) {
+                        uploadSuccess = false;
+                        console.error('File upload error:', uploadError);
+                        uploadErrorMessage = `Upload error: ${uploadError.message}`;
+                    }
+                }
+
+                // Show appropriate message and redirect
+                if (uploadErrorMessage) {
+                    UIComponents.showError(uploadErrorMessage);
+                    // Still redirect after showing error (ticket was created)
+                    setTimeout(() => {
+                        window.location.href = `/client/tickets/detail.html?id=${result.ticketId}`;
+                    }, 3000); // Give user time to see the error
+                } else {
+                    UIComponents.showSuccess('Ticket created successfully!');
+                    setTimeout(() => {
+                        window.location.href = `/client/tickets/detail.html?id=${result.ticketId}`;
+                    }, 1500);
+                }
+
+                // Reset button state regardless
+                UIComponents.setButtonLoading(btn, false);
+                return; // Exit early - don't fall through to error handling
+            } else {
+                // Check if it's a limit error
+                if (result.limit_reached) {
+                    canCreateTicket = false;
+                    showLimitReachedWarning();
+                    UIComponents.showError('Monthly request limit reached. Please contact support to upgrade your plan.');
+                } else {
+                    UIComponents.showError(result.error);
+                }
+                UIComponents.setButtonLoading(btn, false);
+            }
+        }
+    </script>
+</body>
+</html>

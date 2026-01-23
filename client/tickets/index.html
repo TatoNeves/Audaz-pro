@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tickets - Audaz Pro Support</title>
+    <meta name="description" content="Audaz Pro ticket list for clients">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/tickets.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../../images/favicon-32x32.png">
+</head>
+<body class="audaz-body">
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container">
+            <div class="header-grid">
+                <a href="/client/dashboard.html" class="logo-link">
+                    <img src="../../images/66943b1c1348ffa2b811c19c_Audaz Black.png" alt="Audaz Pro" class="logo-image">
+                </a>
+                <nav class="nav">
+                    <ul class="nav-menu">
+                        <li><a href="/client/dashboard.html" class="nav-link">Dashboard</a></li>
+                        <li><a href="/client/tickets/index.html" class="nav-link active">Tickets</a></li>
+                        <li><a href="/client/settings/team.html" class="nav-link">Team</a></li>
+                    </ul>
+                    <div class="user-menu">
+                        <div class="user-avatar"></div>
+                        <span class="user-name">Loading...</span>
+                        <button class="logout-btn btn btn-secondary">Log Out</button>
+                    </div>
+                </nav>
+                <button class="mobile-toggle" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Page Header -->
+        <section class="dashboard-header">
+            <div class="container">
+                <div class="dashboard-header-content">
+                    <div class="dashboard-welcome">
+                        <h1>Tickets</h1>
+                        <p>Manage all your support and change requests</p>
+                    </div>
+                    <a href="/client/tickets/new.html" class="btn btn-primary">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                        New Ticket
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filters -->
+        <section class="filters-section">
+            <div class="container">
+                <div class="filters-bar">
+                    <div class="filter-group">
+                        <label for="filter-status">Status</label>
+                        <select id="filter-status">
+                            <option value="">All</option>
+                            <option value="open">Open</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="done">Done</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-type">Type</label>
+                        <select id="filter-type">
+                            <option value="">All</option>
+                            <option value="alteracao">Change Request</option>
+                            <option value="suporte">Support</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-priority">Priority</label>
+                        <select id="filter-priority">
+                            <option value="">All</option>
+                            <option value="baixa">Low</option>
+                            <option value="media">Normal</option>
+                            <option value="alta">High</option>
+                            <option value="urgente">Urgent</option>
+                        </select>
+                    </div>
+                    <div class="filter-group filter-search">
+                        <label for="filter-search">Search</label>
+                        <input type="text" id="filter-search" placeholder="Search by title...">
+                    </div>
+                    <button class="btn btn-secondary filter-clear" id="clear-filters">Clear</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tickets List -->
+        <section class="tickets-section">
+            <div class="container">
+                <div class="ticket-list" id="tickets-list">
+                    <div class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <p>Loading tickets...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer site-footer-app">
+        <div class="container">
+            <div class="footer-bottom">
+                <img src="../../images/66943b1c1348ffa2b811c19c_Audaz Black.png" alt="Audaz Pro" class="footer-logo-img">
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../js/supabase-config.js"></script>
+    <script src="../../js/services/auth.service.js"></script>
+    <script src="../../js/services/tickets.service.js"></script>
+    <script src="../../js/services/comments.service.js"></script>
+    <script src="../../js/services/invitations.service.js"></script>
+    <script src="../../js/components/ui.components.js"></script>
+    <script src="../../js/components/auth-guard.js"></script>
+    <script>
+        let currentFilters = {};
+        let debounceTimer = null;
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Auth guard
+            const profile = await AuthGuard.init({
+                requiredRoles: ['client_admin', 'client_user'],
+                redirectTo: '/client/index.html'
+            });
+
+            if (!profile) return;
+
+            // Update UI
+            AuthGuard.updateUserInfo(profile);
+            AuthGuard.setupLogoutButton();
+
+            // Mobile menu
+            const mobileToggle = document.querySelector('.mobile-toggle');
+            const nav = document.querySelector('.nav');
+            if (mobileToggle && nav) {
+                mobileToggle.addEventListener('click', () => nav.classList.toggle('active'));
+            }
+
+            // Setup filters
+            setupFilters();
+
+            // Load tickets
+            loadTickets();
+        });
+
+        function setupFilters() {
+            const statusFilter = document.getElementById('filter-status');
+            const typeFilter = document.getElementById('filter-type');
+            const priorityFilter = document.getElementById('filter-priority');
+            const searchFilter = document.getElementById('filter-search');
+            const clearBtn = document.getElementById('clear-filters');
+
+            statusFilter.addEventListener('change', () => {
+                currentFilters.status = statusFilter.value || undefined;
+                loadTickets();
+            });
+
+            typeFilter.addEventListener('change', () => {
+                currentFilters.type = typeFilter.value || undefined;
+                loadTickets();
+            });
+
+            priorityFilter.addEventListener('change', () => {
+                currentFilters.priority = priorityFilter.value || undefined;
+                loadTickets();
+            });
+
+            searchFilter.addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    currentFilters.search = searchFilter.value || undefined;
+                    loadTickets();
+                }, 300);
+            });
+
+            clearBtn.addEventListener('click', () => {
+                statusFilter.value = '';
+                typeFilter.value = '';
+                priorityFilter.value = '';
+                searchFilter.value = '';
+                currentFilters = {};
+                loadTickets();
+            });
+        }
+
+        async function loadTickets() {
+            const container = document.getElementById('tickets-list');
+            UIComponents.showLoading(container, 'Loading tickets...');
+
+            const result = await TicketsService.list(currentFilters);
+
+            if (!result.success) {
+                UIComponents.showError(result.error);
+                container.innerHTML = '<p class="error-message">Error loading tickets</p>';
+                return;
+            }
+
+            if (result.tickets.length === 0) {
+                const hasFilters = Object.keys(currentFilters).some(k => currentFilters[k]);
+                UIComponents.showEmptyState(container, {
+                    icon: hasFilters ? 'search' : 'ticket',
+                    title: hasFilters ? 'No results' : 'No tickets yet',
+                    message: hasFilters
+                        ? 'No tickets match the selected filters.'
+                        : 'You have not opened any tickets yet. Click the button above to create one.',
+                    actionText: hasFilters ? 'Clear Filters' : 'New Ticket',
+                    actionHandler: hasFilters
+                        ? () => document.getElementById('clear-filters').click()
+                        : () => window.location.href = '/client/tickets/new.html'
+                });
+                return;
+            }
+
+            container.innerHTML = result.tickets
+                .map(ticket => UIComponents.createTicketListItem(ticket))
+                .join('');
+        }
+    </script>
+</body>
+</html>
