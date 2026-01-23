@@ -207,9 +207,10 @@ BEGIN
 
     -- Check if user already exists in this organization
     IF EXISTS (
-        SELECT 1 FROM public.profiles
-        WHERE lower(email) = lower(trim(p_email))
-        AND org_id = p_org_id
+        SELECT 1 FROM public.profiles p
+        JOIN auth.users u ON u.id = p.id
+        WHERE lower(u.email) = lower(trim(p_email))
+        AND p.org_id = p_org_id
     ) THEN
         RETURN jsonb_build_object(
             'success', false,
@@ -270,9 +271,9 @@ DECLARE
     v_user_role TEXT;
 BEGIN
     -- Check if user is support
-    SELECT role INTO v_user_role
-    FROM public.profiles
-    WHERE id = auth.uid();
+    SELECT pr.role INTO v_user_role
+    FROM public.profiles pr
+    WHERE pr.id = auth.uid();
 
     IF v_user_role NOT IN ('support_agent', 'support_admin') THEN
         RAISE EXCEPTION 'Access denied';
@@ -281,11 +282,12 @@ BEGIN
     RETURN QUERY
     SELECT
         p.id AS member_id,
-        p.full_name,
-        p.email,
-        p.role,
+        p.full_name::TEXT,
+        u.email::TEXT,
+        p.role::TEXT,
         p.created_at
     FROM public.profiles p
+    JOIN auth.users u ON u.id = p.id
     WHERE p.org_id = p_org_id
     ORDER BY p.created_at;
 END;
@@ -311,9 +313,9 @@ DECLARE
     v_user_role TEXT;
 BEGIN
     -- Check if user is support
-    SELECT role INTO v_user_role
-    FROM public.profiles
-    WHERE id = auth.uid();
+    SELECT pr.role INTO v_user_role
+    FROM public.profiles pr
+    WHERE pr.id = auth.uid();
 
     IF v_user_role NOT IN ('support_agent', 'support_admin') THEN
         RAISE EXCEPTION 'Access denied';
@@ -322,16 +324,16 @@ BEGIN
     RETURN QUERY
     SELECT
         i.id AS invitation_id,
-        i.email,
-        i.role,
-        i.token,
+        i.email::TEXT,
+        i.role::TEXT,
+        i.token::TEXT,
         i.expires_at,
         i.created_at,
         CASE
             WHEN i.accepted_at IS NOT NULL THEN 'accepted'
             WHEN i.expires_at < NOW() THEN 'expired'
             ELSE 'pending'
-        END AS status
+        END::TEXT AS status
     FROM public.invitations i
     WHERE i.org_id = p_org_id
     ORDER BY i.created_at DESC;
