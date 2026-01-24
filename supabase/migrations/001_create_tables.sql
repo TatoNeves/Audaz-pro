@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS public.tickets (
     type TEXT NOT NULL CHECK (type IN ('alteracao', 'suporte')),
     title TEXT NOT NULL,
     description TEXT NOT NULL,
-    priority TEXT NOT NULL CHECK (priority IN ('baixa', 'media', 'alta')),
+    priority TEXT NOT NULL CHECK (priority IN ('baixa', 'media', 'alta', 'urgente')),
     status TEXT NOT NULL CHECK (status IN ('open', 'in_progress', 'done')) DEFAULT 'open',
     category TEXT,
     attachment_url TEXT,

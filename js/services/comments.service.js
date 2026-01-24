@@ -202,7 +202,8 @@ const CommentsService = {
         const translations = {
             'baixa': 'Low',
             'media': 'Medium',
-            'alta': 'High'
+            'alta': 'High',
+            'urgente': 'Urgent'
         };
         return translations[priority] || priority;
     }

@@ -214,6 +214,12 @@
         let emojiPanelElement = null;
         let attachmentsPreviewElement = null;
         let attachmentInputElement = null;
+        let commentsEnabled = true;
+        let commentFormElement = null;
+        let commentSubmitButton = null;
+        let commentToolbarButtons = [];
+        let commentDisabledNote = null;
+        let realtimeChannels = [];
 
         // Priority to deadline days mapping
         const PRIORITY_DEADLINE_DAYS = {
@@ -294,6 +300,7 @@
             await loadCollaborators(ticketId);
             await loadComments(ticketId);
             await loadTimeline(ticketId);
+            setupRealtimeListeners(ticketId);
 
             // Setup actions
             setupActions();
@@ -359,6 +366,7 @@
             const deadline = calculateDeadline(currentTicket.created_at, currentTicket.priority);
             const deadlineStatus = getDeadlineStatus(deadline);
             const isCompleted = currentTicket.status === 'done';
+            updateCommentComposerState(!isCompleted);
 
             // Render status sidebar
             const statusContainer = document.getElementById('ticket-status-info');
@@ -622,6 +630,10 @@
 
                 if (result.success) {
                     UIComponents.showSuccess('Ticket assigned!');
+
+                    // Notify the assigned technician (async)
+                    notifyAssignedTechnician(assigneeId);
+
                     await loadTicket(currentTicket.id);
                     await loadTimeline(currentTicket.id);
                 } else {
@@ -696,6 +708,11 @@
             e.preventDefault();
             const form = e.target;
             const btn = form.querySelector('button[type="submit"]');
+
+            if (!commentsEnabled) {
+                UIComponents.showWarning('This ticket is closed and no longer accepts comments.');
+                return;
+            }
             const rawBody = (form.body.value || '').trim();
             const hasText = Boolean(rawBody);
             const hasAttachments = pendingAttachments.length > 0;
@@ -759,6 +776,43 @@
             }
 
             UIComponents.setButtonLoading(btn, false);
+        }
+
+        // Notify assigned technician about ticket assignment
+        async function notifyAssignedTechnician(assigneeId) {
+            try {
+                if (!currentTicket || !assigneeId) return;
+
+                const client = AudazSupabase.getClient();
+
+                // Get assignee's email using RPC function
+                const { data: assigneeData, error } = await client.rpc('get_user_email', {
+                    user_id: assigneeId
+                });
+
+                if (error || !assigneeData) {
+                    console.warn('Could not get assignee email:', error);
+                    return;
+                }
+
+                const assigneeEmail = assigneeData;
+                const orgName = currentTicket.organization?.name || 'Organization';
+
+                if (assigneeEmail) {
+                    await EmailService.sendTicketNotification({
+                        type: 'ticket_assigned',
+                        to: [assigneeEmail],
+                        ticketId: currentTicket.id,
+                        ticketTitle: currentTicket.title,
+                        orgName: orgName,
+                        ticketUrl: `${window.location.origin}/support/tickets/detail.html?id=${currentTicket.id}`,
+                        assignedBy: currentProfile?.full_name || 'Support Team'
+                    });
+                    console.log('Assigned technician notified');
+                }
+            } catch (err) {
+                console.error('Failed to notify assigned technician:', err);
+            }
         }
 
         // Notify ticket creator about status change
@@ -835,6 +889,9 @@
             }
 
             const form = document.getElementById('comment-form');
+            commentFormElement = form;
+            commentSubmitButton = form?.querySelector('button[type="submit"]');
+            commentToolbarButtons = Array.from(form?.querySelectorAll('.comment-toolbar button') || []);
             commentEditor = document.getElementById('comment-body');
             mentionPanelElement = document.getElementById('mention-panel');
             emojiPanelElement = document.getElementById('emoji-panel');
@@ -937,6 +994,7 @@
             updateNotificationText();
             renderAttachmentPreview();
             populateMentionPanel();
+            updateCommentComposerState(commentsEnabled);
         }
 
         function handleFileSelection(event) {
@@ -1069,6 +1127,96 @@
                 emojiPanelElement.classList.remove('is-open');
             }
         }
+
+        function updateCommentComposerState(enabled) {
+            commentsEnabled = enabled;
+            if (commentEditor) {
+                commentEditor.disabled = !enabled;
+            }
+            if (attachmentInputElement) {
+                attachmentInputElement.disabled = !enabled;
+            }
+            if (commentSubmitButton) {
+                commentSubmitButton.disabled = !enabled;
+                commentSubmitButton.textContent = enabled ? 'Comment' : 'Ticket closed';
+            }
+            commentToolbarButtons.forEach(btn => {
+                btn.disabled = !enabled;
+            });
+            if (commentFormElement) {
+                commentFormElement.classList.toggle('is-disabled', !enabled);
+                if (!enabled && !commentDisabledNote) {
+                    commentDisabledNote = document.createElement('p');
+                    commentDisabledNote.className = 'comment-disabled-note';
+                    commentDisabledNote.textContent = 'This ticket is closed and cannot accept new comments.';
+                    commentFormElement.appendChild(commentDisabledNote);
+                } else if (enabled && commentDisabledNote) {
+                    commentDisabledNote.remove();
+                    commentDisabledNote = null;
+                }
+            }
+        }
+
+        function setupRealtimeListeners(ticketId) {
+            if (!ticketId) return;
+            cleanupRealtimeListeners();
+
+            const client = AudazSupabase.getClient();
+            if (!client || typeof client.channel !== 'function') return;
+
+            const commentChannel = client.channel(`ticket-comments-${ticketId}`)
+                .on('postgres_changes', {
+                    event: '*',
+                    schema: 'public',
+                    table: 'ticket_comments',
+                    filter: `ticket_id=eq.${ticketId}`
+                }, () => {
+                    loadComments(ticketId);
+                    loadCollaborators(ticketId);
+                })
+                .subscribe();
+
+            realtimeChannels.push(commentChannel);
+
+            const eventChannel = client.channel(`ticket-events-${ticketId}`)
+                .on('postgres_changes', {
+                    event: '*',
+                    schema: 'public',
+                    table: 'ticket_events',
+                    filter: `ticket_id=eq.${ticketId}`
+                }, (payload) => {
+                    loadTimeline(ticketId);
+                    const eventRecord = payload?.new || payload?.record;
+                    const eventType = eventRecord?.event_type;
+                    if (eventType && eventType !== 'commented') {
+                        loadTicket(ticketId);
+                    }
+                })
+                .subscribe();
+
+            realtimeChannels.push(eventChannel);
+        }
+
+        function cleanupRealtimeListeners() {
+            const client = AudazSupabase.getClient();
+            if (!client) {
+                realtimeChannels = [];
+                return;
+            }
+
+            realtimeChannels.forEach(channel => {
+                if (!channel) return;
+                if (typeof client.removeChannel === 'function') {
+                    client.removeChannel(channel);
+                } else if (typeof channel.unsubscribe === 'function') {
+                    channel.unsubscribe();
+                }
+            });
+
+            realtimeChannels = [];
+        }
+
+        window.addEventListener('beforeunload', cleanupRealtimeListeners);
 
         function renderTicketAttachments(ticket) {
             // Check for attachments array (new format)

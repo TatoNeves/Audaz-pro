@@ -399,7 +399,7 @@ BEGIN
     END IF;
 
     -- Validate priority
-    IF p_priority NOT IN ('baixa', 'media', 'alta') THEN
+    IF p_priority NOT IN ('baixa', 'media', 'alta', 'urgente') THEN
         RETURN json_build_object('success', false, 'error', 'Invalid priority');
     END IF;
 
