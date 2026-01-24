@@ -33,7 +33,7 @@ serve(async (req) => {
     }
 
     const roleDisplay = role === "client_admin" ? "Administrator" : "User";
-    const expiresDate = new Date(expiresAt).toLocaleDateString("pt-BR", {
+    const expiresDate = new Date(expiresAt).toLocaleDateString("en-US", {
       day: "2-digit",
       month: "long",
       year: "numeric",
@@ -45,61 +45,106 @@ serve(async (req) => {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Convite Audaz Pro</title>
+  <title>Audaz Pro Invitation</title>
+  <style>
+    body {
+      background-color: #f5f5f5;
+      color: #111111;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .email-card {
+      background-color: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(15, 15, 15, 0.15);
+    }
+
+    .email-content {
+      color: #111111;
+    }
+
+    .email-button {
+      background-color: #000000;
+      color: #ffffff;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #000000;
+        color: #f5f5f5;
+      }
+
+      .email-card {
+        background-color: #111111;
+        box-shadow: 0 6px 20px rgba(255, 255, 255, 0.08);
+      }
+
+      .email-content {
+        color: #f5f5f5;
+      }
+
+      .email-button {
+        background-color: #ffffff;
+        color: #000000;
+      }
+    }
+  </style>
 </head>
-<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5;">
+<body class="email-body" style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5;">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f5f5f5; padding: 40px 20px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" class="email-card" style="border-radius: 12px; overflow: hidden;">
           <!-- Header -->
           <tr>
             <td style="background-color: #000000; padding: 30px; text-align: center;">
-              <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: bold;">AUDAZ PRO</h1>
+              <img src="https://audaz-pro-5lkci.ondigitalocean.app/images/66943b1c1348ffa2b811c19c_Audaz%20Black.png" alt="Audaz Pro" style="max-width: 180px; height: auto;">
             </td>
           </tr>
 
           <!-- Content -->
           <tr>
-            <td style="padding: 40px 30px;">
-              <h2 style="color: #333333; margin: 0 0 20px; font-size: 24px;">Você foi convidado!</h2>
+            <td class="email-content" style="padding: 40px 30px;">
+              <h2 style="color: #333333; margin: 0 0 20px; font-size: 24px;">You've been invited!</h2>
 
               <p style="color: #666666; font-size: 16px; line-height: 1.6; margin: 0 0 20px;">
-                Você recebeu um convite para fazer parte da organização <strong style="color: #333333;">${orgName}</strong> no Audaz Pro.
+                You have received an invitation to join the organization <strong style="color: #333333;">${orgName}</strong> on Audaz Pro.
               </p>
 
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f8f9fa; border-radius: 8px; margin: 20px 0;">
                 <tr>
                   <td style="padding: 20px;">
                     <p style="margin: 0 0 10px; color: #666666; font-size: 14px;">
-                      <strong style="color: #333333;">Organização:</strong> ${orgName}
+                      <strong style="color: #333333;">Organization:</strong> ${orgName}
                     </p>
                     <p style="margin: 0 0 10px; color: #666666; font-size: 14px;">
-                      <strong style="color: #333333;">Função:</strong> ${roleDisplay}
+                      <strong style="color: #333333;">Role:</strong> ${roleDisplay}
                     </p>
                     <p style="margin: 0; color: #666666; font-size: 14px;">
-                      <strong style="color: #333333;">Válido até:</strong> ${expiresDate}
+                      <strong style="color: #333333;">Valid until:</strong> ${expiresDate}
                     </p>
                   </td>
                 </tr>
               </table>
 
               <p style="color: #666666; font-size: 16px; line-height: 1.6; margin: 0 0 30px;">
-                Clique no botão abaixo para aceitar o convite e criar sua conta:
+                Click the button below to accept the invitation and create your account:
               </p>
 
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                 <tr>
                   <td align="center">
-                    <a href="${inviteUrl}" style="display: inline-block; background-color: #000000; color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-size: 16px; font-weight: 600;">
-                      Aceitar Convite
+                    <a class="email-button" href="${inviteUrl}" style="display: inline-block; background-color: #000000; color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-size: 16px; font-weight: 600;">
+                      Accept Invitation
                     </a>
                   </td>
                 </tr>
               </table>
 
               <p style="color: #999999; font-size: 14px; line-height: 1.6; margin: 30px 0 0;">
-                Se o botão não funcionar, copie e cole este link no seu navegador:<br>
+                If the button doesn't work, copy and paste this link into your browser:<br>
                 <a href="${inviteUrl}" style="color: #666666; word-break: break-all;">${inviteUrl}</a>
               </p>
             </td>
@@ -109,10 +154,10 @@ serve(async (req) => {
           <tr>
             <td style="background-color: #f8f9fa; padding: 20px 30px; text-align: center; border-top: 1px solid #eeeeee;">
               <p style="color: #999999; font-size: 12px; margin: 0;">
-                © ${new Date().getFullYear()} Audaz Pro. Todos os direitos reservados.
+                © ${new Date().getFullYear()} Audaz Pro. All rights reserved.
               </p>
               <p style="color: #999999; font-size: 12px; margin: 10px 0 0;">
-                Este email foi enviado porque alguém convidou você para o Audaz Pro.
+                This email was sent because someone invited you to Audaz Pro.
               </p>
             </td>
           </tr>
@@ -131,9 +176,9 @@ serve(async (req) => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Audaz Pro <noreply@audazpro.com>",
+        from: "Audaz Pro <noreply@audazpro.ca>",
         to: [to],
-        subject: `Convite para ${orgName} - Audaz Pro`,
+        subject: `Invitation to ${orgName} - Audaz Pro`,
         html: html,
       }),
     });

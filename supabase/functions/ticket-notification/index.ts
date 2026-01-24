@@ -34,60 +34,117 @@ interface NotificationRequest {
   ticketUrl?: string;
 }
 
-const statusTranslations: Record<string, string> = {
-  open: "Aberto",
-  in_progress: "Em Progresso",
-  done: "Concluído",
+const statusLabels: Record<string, string> = {
+  open: "Open",
+  in_progress: "In Progress",
+  done: "Done",
 };
 
-const priorityTranslations: Record<string, string> = {
-  baixa: "Baixa",
-  media: "Média",
-  alta: "Alta",
+const priorityLabels: Record<string, string> = {
+  baixa: "Low",
+  media: "Medium",
+  alta: "High",
+  low: "Low",
+  medium: "Medium",
+  high: "High",
 };
 
-const typeTranslations: Record<string, string> = {
-  alteracao: "Alteração",
-  suporte: "Suporte",
+const typeLabels: Record<string, string> = {
+  alteracao: "Change Request",
+  suporte: "Support",
+  change: "Change Request",
+  support: "Support",
 };
 
 function getSubject(type: NotificationType, ticketTitle: string): string {
   const subjects: Record<NotificationType, string> = {
-    ticket_created: `Novo Ticket: ${ticketTitle}`,
-    ticket_status_changed: `Status Atualizado: ${ticketTitle}`,
-    ticket_assigned: `Ticket Atribuído: ${ticketTitle}`,
-    ticket_comment: `Novo Comentário: ${ticketTitle}`,
-    ticket_priority_changed: `Prioridade Alterada: ${ticketTitle}`,
+    ticket_created: `New Ticket: ${ticketTitle}`,
+    ticket_status_changed: `Status Updated: ${ticketTitle}`,
+    ticket_assigned: `Ticket Assigned: ${ticketTitle}`,
+    ticket_comment: `New Comment: ${ticketTitle}`,
+    ticket_priority_changed: `Priority Changed: ${ticketTitle}`,
   };
   return subjects[type];
 }
+
+const emailStyles = `
+  <style>
+    body {
+      background-color: #f5f5f5;
+      color: #111111;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .email-card {
+      background-color: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(15, 15, 15, 0.15);
+    }
+
+    .email-content {
+      color: #111111;
+    }
+
+    .email-button {
+      background-color: #000000;
+      color: #ffffff;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #000000;
+        color: #f5f5f5;
+      }
+
+      .email-card {
+        background-color: #111111;
+        box-shadow: 0 6px 20px rgba(255, 255, 255, 0.08);
+      }
+
+      .email-content {
+        color: #f5f5f5;
+      }
+
+      .email-button {
+        background-color: #ffffff;
+        color: #000000;
+      }
+
+      .email-meta {
+        color: rgba(255, 255, 255, 0.75);
+      }
+    }
+  </style>
+`;
 
 function generateEmailContent(data: NotificationRequest): string {
   const { type, ticketTitle, ticketType, orgName, ticketUrl } = data;
 
   let contentHtml = "";
   let headerColor = "#000000";
-  let headerText = "Notificação";
+  let headerText = "Notification";
 
   switch (type) {
     case "ticket_created":
-      headerText = "Novo Ticket Criado";
+      headerText = "New Ticket Created";
       headerColor = "#22c55e";
       contentHtml = `
         <p style="color: #666666; font-size: 16px; line-height: 1.6; margin: 0 0 20px;">
-          Um novo ticket foi criado por <strong>${data.createdBy}</strong>:
+          A new ticket was created by <strong>${data.createdBy}</strong>:
         </p>
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f8f9fa; border-radius: 8px; margin: 20px 0;">
           <tr>
             <td style="padding: 20px;">
               <p style="margin: 0 0 10px; color: #666666; font-size: 14px;">
-                <strong style="color: #333333;">Título:</strong> ${ticketTitle}
+                <strong style="color: #333333;">Title:</strong> ${ticketTitle}
               </p>
               <p style="margin: 0 0 10px; color: #666666; font-size: 14px;">
-                <strong style="color: #333333;">Tipo:</strong> ${typeTranslations[ticketType || ""] || ticketType}
+                <strong style="color: #333333;">Type:</strong> ${typeLabels[ticketType || ""] || ticketType}
               </p>
               <p style="margin: 0; color: #666666; font-size: 14px;">
-                <strong style="color: #333333;">Organização:</strong> ${orgName}
+                <strong style="color: #333333;">Organization:</strong> ${orgName}
               </p>
             </td>
           </tr>
@@ -96,11 +153,11 @@ function generateEmailContent(data: NotificationRequest): string {
       break;
 
     case "ticket_status_changed":
-      headerText = "Status Atualizado";
+      headerText = "Status Updated";
       headerColor = "#3b82f6";
       contentHtml = `
         <p style="color: #666666; font-size: 16px; line-height: 1.6; margin: 0 0 20px;">
-          O status do ticket foi atualizado:
+          The ticket status has been updated:
         </p>
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f8f9fa; border-radius: 8px; margin: 20px 0;">
           <tr>
@@ -109,12 +166,12 @@ function generateEmailContent(data: NotificationRequest): string {
                 <strong style="color: #333333;">Ticket:</strong> ${ticketTitle}
               </p>
               <p style="margin: 0 0 10px; color: #666666; font-size: 14px;">
-                <strong style="color: #333333;">Status Anterior:</strong> ${statusTranslations[data.oldStatus || ""] || data.oldStatus}
+                <strong style="color: #333333;">Previous Status:</strong> ${statusLabels[data.oldStatus || ""] || data.oldStatus}
               </p>
               <p style="margin: 0; color: #666666; font-size: 14px;">
-                <strong style="color: #333333;">Novo Status:</strong>
+                <strong style="color: #333333;">New Status:</strong>
                 <span style="background-color: #22c55e; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">
-                  ${statusTranslations[data.newStatus || ""] || data.newStatus}
+                  ${statusLabels[data.newStatus || ""] || data.newStatus}
                 </span>
               </p>
             </td>
@@ -124,11 +181,11 @@ function generateEmailContent(data: NotificationRequest): string {
       break;
 
     case "ticket_assigned":
-      headerText = "Ticket Atribuído";
+      headerText = "Ticket Assigned";
       headerColor = "#8b5cf6";
       contentHtml = `
         <p style="color: #666666; font-size: 16px; line-height: 1.6; margin: 0 0 20px;">
-          Um ticket foi atribuído a você:
+          A ticket has been assigned to you:
         </p>
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f8f9fa; border-radius: 8px; margin: 20px 0;">
           <tr>
@@ -137,10 +194,10 @@ function generateEmailContent(data: NotificationRequest): string {
                 <strong style="color: #333333;">Ticket:</strong> ${ticketTitle}
               </p>
               <p style="margin: 0 0 10px; color: #666666; font-size: 14px;">
-                <strong style="color: #333333;">Atribuído por:</strong> ${data.assignedBy}
+                <strong style="color: #333333;">Assigned by:</strong> ${data.assignedBy}
               </p>
               <p style="margin: 0; color: #666666; font-size: 14px;">
-                <strong style="color: #333333;">Organização:</strong> ${orgName}
+                <strong style="color: #333333;">Organization:</strong> ${orgName}
               </p>
             </td>
           </tr>
@@ -149,11 +206,11 @@ function generateEmailContent(data: NotificationRequest): string {
       break;
 
     case "ticket_comment":
-      headerText = "Novo Comentário";
+      headerText = "New Comment";
       headerColor = "#f59e0b";
       contentHtml = `
         <p style="color: #666666; font-size: 16px; line-height: 1.6; margin: 0 0 20px;">
-          <strong>${data.commentBy}</strong> adicionou um comentário:
+          <strong>${data.commentBy}</strong> added a comment:
         </p>
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f8f9fa; border-radius: 8px; margin: 20px 0;">
           <tr>
@@ -171,11 +228,11 @@ function generateEmailContent(data: NotificationRequest): string {
       break;
 
     case "ticket_priority_changed":
-      headerText = "Prioridade Alterada";
+      headerText = "Priority Changed";
       headerColor = "#ef4444";
       contentHtml = `
         <p style="color: #666666; font-size: 16px; line-height: 1.6; margin: 0 0 20px;">
-          A prioridade do ticket foi alterada:
+          The ticket priority has been changed:
         </p>
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f8f9fa; border-radius: 8px; margin: 20px 0;">
           <tr>
@@ -184,12 +241,12 @@ function generateEmailContent(data: NotificationRequest): string {
                 <strong style="color: #333333;">Ticket:</strong> ${ticketTitle}
               </p>
               <p style="margin: 0 0 10px; color: #666666; font-size: 14px;">
-                <strong style="color: #333333;">Prioridade Anterior:</strong> ${priorityTranslations[data.oldPriority || ""] || data.oldPriority}
+                <strong style="color: #333333;">Previous Priority:</strong> ${priorityLabels[data.oldPriority || ""] || data.oldPriority}
               </p>
               <p style="margin: 0; color: #666666; font-size: 14px;">
-                <strong style="color: #333333;">Nova Prioridade:</strong>
-                <span style="background-color: ${data.newPriority === 'alta' ? '#ef4444' : data.newPriority === 'media' ? '#f59e0b' : '#22c55e'}; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">
-                  ${priorityTranslations[data.newPriority || ""] || data.newPriority}
+                <strong style="color: #333333;">New Priority:</strong>
+                <span style="background-color: ${data.newPriority === 'alta' || data.newPriority === 'high' ? '#ef4444' : data.newPriority === 'media' || data.newPriority === 'medium' ? '#f59e0b' : '#22c55e'}; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">
+                  ${priorityLabels[data.newPriority || ""] || data.newPriority}
                 </span>
               </p>
             </td>
@@ -206,12 +263,13 @@ function generateEmailContent(data: NotificationRequest): string {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${headerText} - Audaz Pro</title>
-</head>
-<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5;">
+  ${emailStyles}
+  </head>
+<body class="email-body" style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5;">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f5f5f5; padding: 40px 20px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" class="email-card" style="border-radius: 12px; overflow: hidden;">
           <!-- Header -->
           <tr>
             <td style="background-color: ${headerColor}; padding: 30px; text-align: center;">
@@ -222,14 +280,14 @@ function generateEmailContent(data: NotificationRequest): string {
 
           <!-- Content -->
           <tr>
-            <td style="padding: 40px 30px;">
+            <td class="email-content" style="padding: 40px 30px;">
               ${contentHtml}
 
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top: 30px;">
                 <tr>
                   <td align="center">
-                    <a href="${ticketUrl}" style="display: inline-block; background-color: #000000; color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-size: 16px; font-weight: 600;">
-                      Ver Ticket
+                    <a class="email-button" href="${ticketUrl}" style="display: inline-block; background-color: #000000; color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-size: 16px; font-weight: 600;">
+                      View Ticket
                     </a>
                   </td>
                 </tr>
@@ -241,10 +299,10 @@ function generateEmailContent(data: NotificationRequest): string {
           <tr>
             <td style="background-color: #f8f9fa; padding: 20px 30px; text-align: center; border-top: 1px solid #eeeeee;">
               <p style="color: #999999; font-size: 12px; margin: 0;">
-                © ${new Date().getFullYear()} Audaz Pro. Todos os direitos reservados.
+                © ${new Date().getFullYear()} Audaz Pro. All rights reserved.
               </p>
               <p style="color: #999999; font-size: 12px; margin: 10px 0 0;">
-                Você está recebendo este email porque faz parte de ${orgName}.
+                You are receiving this email because you are part of ${orgName}.
               </p>
             </td>
           </tr>
@@ -284,7 +342,7 @@ serve(async (req) => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Audaz Pro <noreply@audazpro.com>",
+        from: "Audaz Pro <noreply@audazpro.ca>",
         to: data.to,
         subject: subject,
         html: html,
