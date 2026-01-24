@@ -841,42 +841,31 @@
             }
         }
 
-        // Notify ticket creator about comment from support
+        // Notify collaborators when support adds a comment
         async function notifyClientAboutComment(commentBody) {
             try {
-                if (!currentTicket || !currentTicket.created_by) return;
+                if (!currentTicket) return;
 
-                const client = AudazSupabase.getClient();
+                const notifyEmails = getCollaboratorEmails();
 
-                // Get ticket creator's email
-                const { data: creatorProfile } = await client
-                    .from('profiles')
-                    .select('id, full_name')
-                    .eq('id', currentTicket.created_by)
-                    .single();
-
-                if (!creatorProfile) return;
-
-                // Get email from auth.users (we need RPC for this)
-                // For now use a placeholder - you'd need to get this from the ticket data or a join
-                const creatorEmail = currentTicket.created_by_email || null;
-
-                // Get organization name
-                let orgName = currentTicket.org_name || 'Your Organization';
-
-                if (creatorEmail) {
-                    await EmailService.sendTicketNotification({
-                        type: 'ticket_comment',
-                        to: [creatorEmail],
-                        ticketId: currentTicket.id,
-                        ticketTitle: currentTicket.title,
-                        orgName: orgName,
-                        ticketUrl: `${window.location.origin}/client/tickets/detail.html?id=${currentTicket.id}`,
-                        commentBy: currentProfile?.full_name || 'Support Team',
-                        commentPreview: commentBody.substring(0, 200)
-                    });
-                    console.log('Client notified about support comment');
+                if (!notifyEmails.length && currentTicket.created_by_email) {
+                    notifyEmails.push(currentTicket.created_by_email);
                 }
+
+                if (!notifyEmails.length) {
+                    notifyEmails.push('support@audazpro.com');
+                }
+
+                await EmailService.notifyNewComment({
+                    ticket: currentTicket,
+                    commentBy: currentProfile?.full_name || 'Support Team',
+                    commentPreview: commentBody,
+                    notifyEmails,
+                    orgName: currentTicket.organization?.name || 'Your Organization',
+                    isSupport: true
+                });
+
+                console.log('Collaborators notified about support comment');
             } catch (err) {
                 console.error('Failed to notify client about comment:', err);
             }
@@ -1126,6 +1115,21 @@
             if (emojiPanelElement) {
                 emojiPanelElement.classList.remove('is-open');
             }
+        }
+
+        function getCollaboratorEmails(excludeCurrentUser = true) {
+            const emails = new Set();
+            if (!ticketCollaborators || !ticketCollaborators.length) {
+                return [];
+            }
+
+            ticketCollaborators.forEach(collab => {
+                if (!collab || !collab.email) return;
+                if (excludeCurrentUser && currentProfile?.id && collab.user_id === currentProfile.id) return;
+                emails.add(collab.email);
+            });
+
+            return Array.from(emails);
         }
 
         function updateCommentComposerState(enabled) {

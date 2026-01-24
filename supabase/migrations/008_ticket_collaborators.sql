@@ -176,9 +176,11 @@ BEGIN
             tc.added_at,
             p.full_name,
             p.avatar_url,
-            p.role as user_role
+            p.role as user_role,
+            u.email
         FROM public.ticket_collaborators tc
         JOIN public.profiles p ON p.id = tc.user_id
+        LEFT JOIN auth.users u ON u.id = p.id
         WHERE tc.ticket_id = p_ticket_id
         ORDER BY
             CASE tc.role

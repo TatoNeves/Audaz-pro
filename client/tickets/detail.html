@@ -735,36 +735,32 @@
                     if (org) orgName = org.name;
                 }
 
-                // Determine who to notify
-                let notifyEmail = null;
+                // Build recipient list (collaborators + assigned technician)
+                const notifyEmails = new Set(getCollaboratorEmails());
 
-                // If ticket has an assigned technician, get their email
                 if (currentTicket.assigned_to) {
                     const { data: assigneeEmail, error } = await client.rpc('get_user_email', {
                         user_id: currentTicket.assigned_to
                     });
                     if (!error && assigneeEmail) {
-                        notifyEmail = assigneeEmail;
+                        notifyEmails.add(assigneeEmail);
                     }
                 }
 
-                // Fallback to support email if no assignee
-                if (!notifyEmail) {
-                    notifyEmail = 'support@audazpro.com';
+                if (notifyEmails.size === 0) {
+                    notifyEmails.add('support@audazpro.com');
                 }
 
-                await EmailService.sendTicketNotification({
-                    type: 'ticket_comment',
-                    to: [notifyEmail],
-                    ticketId: currentTicket.id,
-                    ticketTitle: currentTicket.title,
-                    orgName: orgName,
-                    ticketUrl: `${window.location.origin}/support/tickets/detail.html?id=${currentTicket.id}`,
+                await EmailService.notifyNewComment({
+                    ticket: currentTicket,
                     commentBy: currentProfile?.full_name || 'Client',
-                    commentPreview: commentBody.substring(0, 200)
+                    commentPreview: commentBody,
+                    notifyEmails: Array.from(notifyEmails),
+                    orgName,
+                    isSupport: false
                 });
 
-                console.log('Assigned technician notified about new comment');
+                console.log('Collaborators/support notified about new comment');
             } catch (err) {
                 console.error('Failed to notify about comment:', err);
             }
@@ -1089,6 +1085,21 @@
             if (emojiPanelElement) {
                 emojiPanelElement.classList.remove('is-open');
             }
+        }
+
+        function getCollaboratorEmails(excludeCurrentUser = true) {
+            const emails = new Set();
+            if (!ticketCollaborators || !ticketCollaborators.length) {
+                return [];
+            }
+
+            ticketCollaborators.forEach(collab => {
+                if (!collab || !collab.email) return;
+                if (excludeCurrentUser && currentProfile?.id && collab.user_id === currentProfile.id) return;
+                emails.add(collab.email);
+            });
+
+            return Array.from(emails);
         }
 
         function updateCommentComposerState(enabled) {
