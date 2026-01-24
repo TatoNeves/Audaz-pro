@@ -330,24 +330,38 @@
                 return;
             }
 
-            if (result.tickets.length === 0) {
+            const showDone = currentFilters.status === 'done';
+            const ticketsToShow = showDone
+                ? result.tickets
+                : result.tickets.filter(ticket => ticket.status !== 'done');
+
+            if (ticketsToShow.length === 0) {
                 const hasFilters = Object.keys(currentFilters).some(k => currentFilters[k]);
+                const isNoOpen = !showDone;
                 UIComponents.showEmptyState(container, {
                     icon: hasFilters ? 'search' : 'ticket',
-                    title: hasFilters ? 'No results' : 'No tickets yet',
-                    message: hasFilters
-                        ? 'No tickets match the selected filters.'
-                        : 'No tickets are in the system yet.',
-                    actionText: hasFilters ? 'Clear Filters' : null,
+                    title: isNoOpen ? 'No open tickets' : (hasFilters ? 'No results' : 'No tickets yet'),
+                    message: isNoOpen
+                        ? 'No open tickets match the filters. Select a status if you need to see closed work.'
+                        : hasFilters
+                            ? 'No tickets match the selected filters.'
+                            : 'No tickets are in the system yet.',
+                    actionText: hasFilters ? 'Clear Filters' : (isNoOpen ? 'Show Done' : null),
                     actionHandler: hasFilters
                         ? () => document.getElementById('clear-filters').click()
-                        : null
+                        : (isNoOpen
+                            ? () => {
+                                currentFilters.status = 'done';
+                                document.getElementById('filter-status').value = 'done';
+                                loadTickets();
+                              }
+                            : null)
                 });
                 return;
             }
 
             // Sort tickets by deadline urgency
-            const sortedTickets = sortTicketsByDeadline(result.tickets);
+            const sortedTickets = sortTicketsByDeadline(ticketsToShow);
 
             container.innerHTML = sortedTickets
                 .map(ticket => createTicketItemWithDeadline(ticket))

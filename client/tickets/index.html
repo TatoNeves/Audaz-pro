@@ -222,23 +222,37 @@
                 return;
             }
 
-            if (result.tickets.length === 0) {
+            const showDone = currentFilters.status === 'done';
+            const ticketsToShow = showDone
+                ? result.tickets
+                : result.tickets.filter(ticket => ticket.status !== 'done');
+
+            if (ticketsToShow.length === 0) {
                 const hasFilters = Object.keys(currentFilters).some(k => currentFilters[k]);
+                const isNoOpen = !showDone;
                 UIComponents.showEmptyState(container, {
                     icon: hasFilters ? 'search' : 'ticket',
-                    title: hasFilters ? 'No results' : 'No tickets yet',
-                    message: hasFilters
-                        ? 'No tickets match the selected filters.'
-                        : 'You have not opened any tickets yet. Click the button above to create one.',
-                    actionText: hasFilters ? 'Clear Filters' : 'New Ticket',
+                    title: isNoOpen ? 'No open tickets' : (hasFilters ? 'No results' : 'No tickets yet'),
+                    message: isNoOpen
+                        ? 'No open tickets match the filters. Select a status to show completed work.'
+                        : hasFilters
+                            ? 'No tickets match the selected filters.'
+                            : 'You have not opened any tickets yet. Click the button above to create one.',
+                    actionText: hasFilters ? 'Clear Filters' : (isNoOpen ? 'Show Done' : 'New Ticket'),
                     actionHandler: hasFilters
                         ? () => document.getElementById('clear-filters').click()
-                        : () => window.location.href = '/client/tickets/new.html'
+                        : (isNoOpen
+                            ? () => {
+                                currentFilters.status = 'done';
+                                document.getElementById('filter-status').value = 'done';
+                                loadTickets();
+                              }
+                            : () => window.location.href = '/client/tickets/new.html')
                 });
                 return;
             }
 
-            container.innerHTML = result.tickets
+            container.innerHTML = ticketsToShow
                 .map(ticket => UIComponents.createTicketListItem(ticket))
                 .join('');
         }
