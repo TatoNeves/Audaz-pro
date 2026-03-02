@@ -360,13 +360,27 @@
                 const client = AudazSupabase.getClient();
                 const session = await AudazSupabase.getCurrentSession();
 
+                if (!session) {
+                    throw new Error('Session expired — please refresh the page and try again.');
+                }
+
                 const { data, error } = await client.functions.invoke('create-checkout-session', {
                     body: { quantity },
                     headers: { Authorization: `Bearer ${session.access_token}` }
                 });
 
-                if (error || !data?.success) {
-                    throw new Error(data?.error || error?.message || 'Failed to start checkout');
+                // Extract actual error message from the function response body
+                if (error) {
+                    let detail = error.message;
+                    try {
+                        const body = await error.context?.json?.();
+                        if (body?.error) detail = body.error;
+                    } catch {}
+                    throw new Error(detail || 'Failed to start checkout');
+                }
+
+                if (!data?.success) {
+                    throw new Error(data?.error || 'Failed to start checkout');
                 }
 
                 window.location.href = data.url;
