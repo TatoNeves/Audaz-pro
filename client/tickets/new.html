@@ -192,7 +192,7 @@
                         </svg>
                         <div>
                             <h4>Monthly Limit Reached</h4>
-                            <p>Your organization has reached the monthly request limit. Please contact support to upgrade your plan or wait until next month.</p>
+                            <p>Your organization has used all available requests. <a href="/client/dashboard.html" style="color: inherit; text-decoration: underline;">Purchase extra tasks</a> from the dashboard to keep submitting requests.</p>
                         </div>
                     </div>
 
@@ -284,8 +284,10 @@
             const result = await TicketsService.getMonthlyUsage(currentProfile.org_id);
 
             if (result.success) {
-                const { limit, used, remaining } = result.usage;
-                const percent = limit > 0 ? Math.min((used / limit) * 100, 100) : 0;
+                const { limit, used, remaining, extra_tasks } = result.usage;
+                const extraTasks = extra_tasks || 0;
+                const totalAvailable = remaining + extraTasks;
+                const percent = limit > 0 ? Math.min((used / limit) * 100, 100) : (extraTasks > 0 ? 100 : 0);
 
                 // Show usage indicator
                 const indicator = document.getElementById('usage-indicator');
@@ -308,13 +310,16 @@
 
                 if (remaining > 0) {
                     hintEl.textContent = `You have ${remaining} request${remaining !== 1 ? 's' : ''} remaining this month`;
+                } else if (extraTasks > 0) {
+                    hintEl.textContent = `Monthly limit reached · ${extraTasks} extra task${extraTasks !== 1 ? 's' : ''} available`;
+                    hintEl.style.color = '#f59e0b';
                 } else {
                     hintEl.textContent = 'You have reached your monthly limit';
                     hintEl.style.color = '#ef4444';
                 }
 
-                // Check if can create ticket
-                if (remaining <= 0) {
+                // Check if can create ticket (monthly remaining + extra tasks)
+                if (totalAvailable <= 0) {
                     canCreateTicket = false;
                     showLimitReachedWarning();
                 }
@@ -580,7 +585,7 @@
 
             // Check limit again before submitting
             if (!canCreateTicket) {
-                UIComponents.showError('Monthly request limit reached. Please contact support.');
+                UIComponents.showError('Monthly request limit reached. Purchase extra tasks from the dashboard to continue.');
                 return;
             }
 
@@ -677,7 +682,7 @@
                 if (result.limit_reached) {
                     canCreateTicket = false;
                     showLimitReachedWarning();
-                    UIComponents.showError('Monthly request limit reached. Please contact support to upgrade your plan.');
+                    UIComponents.showError('Monthly request limit reached. Purchase extra tasks from the dashboard to continue.');
                 } else {
                     UIComponents.showError(result.error);
                 }
