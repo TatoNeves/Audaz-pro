@@ -26,9 +26,11 @@ serve(async (req) => {
     }
     const token = authHeader.replace("Bearer ", "");
 
+    // Include the JWT in global headers so RLS policies can resolve auth.uid()
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: `Bearer ${token}` } } }
     );
 
     // Pass the JWT directly to getUser — required pattern for edge functions
