@@ -66,44 +66,52 @@ const EmailService = {
     }) {
         const client = AudazSupabase.getClient();
         if (!client) {
+            console.error('[EmailService] Supabase client not available');
             return { success: false, error: 'Supabase not configured' };
         }
 
+        const payload = {
+            type,
+            to: Array.isArray(to) ? to : [to],
+            ticketId,
+            ticketTitle,
+            ticketType,
+            orgName,
+            ticketUrl,
+            createdBy,
+            oldStatus,
+            newStatus,
+            assignedTo,
+            assignedBy,
+            commentBy,
+            commentPreview,
+            oldPriority,
+            newPriority
+        };
+
+        console.log('[EmailService] Sending notification:', JSON.stringify(payload, null, 2));
+
         try {
             const { data, error } = await client.functions.invoke('ticket-notification', {
-                body: {
-                    type,
-                    to: Array.isArray(to) ? to : [to],
-                    ticketId,
-                    ticketTitle,
-                    ticketType,
-                    orgName,
-                    ticketUrl,
-                    createdBy,
-                    oldStatus,
-                    newStatus,
-                    assignedTo,
-                    assignedBy,
-                    commentBy,
-                    commentPreview,
-                    oldPriority,
-                    newPriority
-                }
+                body: payload
             });
 
+            console.log('[EmailService] Response:', { data, error });
+
             if (error) {
-                console.error('Send ticket notification error:', error);
+                console.error('[EmailService] Function invoke error:', error);
                 return { success: false, error: error.message || 'Failed to send notification' };
             }
 
             if (data && !data.success) {
-                console.error('Send ticket notification error:', data.error);
+                console.error('[EmailService] Function returned error:', data.error);
                 return { success: false, error: data.error || 'Failed to send notification' };
             }
 
+            console.log('[EmailService] Notification sent successfully, messageId:', data?.messageId);
             return { success: true, messageId: data?.messageId };
         } catch (error) {
-            console.error('Send ticket notification error:', error);
+            console.error('[EmailService] Exception:', error);
             return { success: false, error: error.message };
         }
     },

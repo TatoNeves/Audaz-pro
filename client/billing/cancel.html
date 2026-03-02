@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Cancelled - Audaz Pro</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/tickets.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="../../images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../../images/favicon-16x16.png">
+
+    <style>
+        .billing-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .billing-card {
+            background: var(--color-surface, #fff);
+            border: 1px solid var(--color-border, #e5e7eb);
+            border-radius: 16px;
+            padding: 48px 40px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .billing-icon {
+            width: 64px;
+            height: 64px;
+            background: #fef3c7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+        }
+
+        .billing-icon svg {
+            color: #d97706;
+        }
+
+        .billing-card h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 12px;
+        }
+
+        .billing-card p {
+            color: var(--color-text-secondary, #6b7280);
+            font-size: 15px;
+            line-height: 1.6;
+            margin: 0 0 8px;
+        }
+
+        .billing-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 28px;
+        }
+    </style>
+</head>
+<body class="audaz-body">
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container">
+            <div class="header-grid">
+                <a href="/client/dashboard.html" class="logo-link">
+                    <img src="../../images/66943b1c1348ffa2b811c19c_Audaz Black.png" alt="Audaz Pro" class="logo-image">
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="billing-page">
+        <div class="billing-card">
+            <div class="billing-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="15" y1="9" x2="9" y2="15"/>
+                    <line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+            </div>
+
+            <h1>Payment Cancelled</h1>
+            <p>Your payment was cancelled. No charge was made to your account.</p>
+            <p>You can try again at any time from your dashboard.</p>
+
+            <div class="billing-actions">
+                <a href="/client/dashboard.html" class="btn btn-primary">Back to Dashboard</a>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

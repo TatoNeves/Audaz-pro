@@ -384,7 +384,8 @@ const TicketsService = {
                         used: data[0].tickets_used,
                         remaining: data[0].tickets_remaining,
                         month: data[0].current_month,
-                        planName: data[0].plan_name
+                        planName: data[0].plan_name,
+                        extra_tasks: data[0].extra_tasks || 0
                     }
                 };
             }
@@ -396,7 +397,8 @@ const TicketsService = {
                     used: 0,
                     remaining: 10,
                     month: new Date().toISOString().slice(0, 7),
-                    planName: 'Basic'
+                    planName: 'Basic',
+                    extra_tasks: 0
                 }
             };
         } catch (err) {

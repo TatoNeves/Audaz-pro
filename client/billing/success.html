@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - Audaz Pro</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/tickets.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="../../images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../../images/favicon-16x16.png">
+
+    <style>
+        .billing-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .billing-card {
+            background: var(--color-surface, #fff);
+            border: 1px solid var(--color-border, #e5e7eb);
+            border-radius: 16px;
+            padding: 48px 40px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .billing-icon {
+            width: 64px;
+            height: 64px;
+            background: #d1fae5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+        }
+
+        .billing-icon svg {
+            color: #059669;
+        }
+
+        .billing-card h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 12px;
+        }
+
+        .billing-card p {
+            color: var(--color-text-secondary, #6b7280);
+            font-size: 15px;
+            line-height: 1.6;
+            margin: 0 0 8px;
+        }
+
+        .tasks-added {
+            background: var(--color-bg, #f9fafb);
+            border: 1px solid var(--color-border, #e5e7eb);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 24px 0;
+            font-size: 15px;
+            color: var(--color-text, #111);
+        }
+
+        .tasks-added strong {
+            font-size: 28px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .billing-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 28px;
+        }
+    </style>
+</head>
+<body class="audaz-body">
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container">
+            <div class="header-grid">
+                <a href="/client/dashboard.html" class="logo-link">
+                    <img src="../../images/66943b1c1348ffa2b811c19c_Audaz Black.png" alt="Audaz Pro" class="logo-image">
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="billing-page">
+        <div class="billing-card">
+            <div class="billing-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="32" height="32">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+            </div>
+
+            <h1>Payment Successful!</h1>
+            <p>Your extra tasks have been added to your account and are ready to use.</p>
+
+            <div class="tasks-added" id="tasks-summary">
+                <strong id="quantity-display">—</strong>
+                <span>extra tasks added</span>
+            </div>
+
+            <p id="loading-note" style="font-size: 13px; color: var(--color-text-secondary, #9ca3af);">
+                Tasks are usually available within a few seconds. If they don't appear immediately, refresh the dashboard.
+            </p>
+
+            <div class="billing-actions">
+                <a href="/client/tickets/new.html" class="btn btn-primary">Open a Ticket</a>
+                <a href="/client/dashboard.html" class="btn btn-secondary">Go to Dashboard</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Read quantity from session metadata via URL param
+        const params = new URLSearchParams(window.location.search);
+        const sessionId = params.get('session_id');
+
+        // Show a generic success while the webhook processes in the background
+        // The quantity is stored in session metadata but not easily readable client-side
+        // So we show a generic message — the dashboard will reflect the real number
+        const quantityEl = document.getElementById('quantity-display');
+        quantityEl.textContent = '✓';
+
+        if (sessionId) {
+            document.getElementById('tasks-summary').innerHTML = `
+                <strong style="font-size: 18px; color: #059669;">Tasks added successfully</strong>
+                <span style="display: block; margin-top: 4px; font-size: 13px; color: #6b7280;">Session: ${sessionId.slice(0, 20)}...</span>
+            `;
+        }
+    </script>
+</body>
+</html>

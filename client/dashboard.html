@@ -68,6 +68,52 @@
             </div>
         </section>
 
+        <!-- Task Usage Banner (shown when remaining ≤ 2) -->
+        <section id="usage-banner" style="display:none;">
+            <div class="container">
+                <div id="usage-banner-inner" class="usage-banner"></div>
+            </div>
+        </section>
+
+        <!-- Buy Extra Tasks Modal -->
+        <div id="buy-tasks-modal" class="modal-overlay" style="display:none;">
+            <div class="modal-container" style="max-width:420px;">
+                <div class="modal-header">
+                    <h3 class="modal-title">Buy Extra Tasks</h3>
+                    <button class="modal-close" id="close-buy-modal" aria-label="Close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p style="color:var(--color-text-secondary,#6b7280);margin:0 0 20px;font-size:14px;line-height:1.6;">
+                        Extra tasks never expire — they're consumed after your monthly allocation runs out.
+                    </p>
+                    <div style="margin-bottom:20px;">
+                        <label class="form-label" for="task-quantity">Number of tasks</label>
+                        <input
+                            type="number"
+                            id="task-quantity"
+                            class="form-input"
+                            min="1"
+                            max="500"
+                            value="10"
+                            placeholder="e.g. 10"
+                            style="font-size:18px;font-weight:600;text-align:center;"
+                        >
+                    </div>
+                    <div id="buy-tasks-error" style="display:none;color:#ef4444;font-size:13px;margin-bottom:12px;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancel-buy-modal">Cancel</button>
+                    <button class="btn btn-primary" id="confirm-buy-tasks">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                            <line x1="1" y1="10" x2="23" y2="10"/>
+                        </svg>
+                        Proceed to Checkout
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Stats Section -->
         <section class="dashboard-stats">
             <div class="container">
@@ -158,6 +204,8 @@
     <script src="../js/components/ui.components.js"></script>
     <script src="../js/components/auth-guard.js"></script>
     <script>
+        let currentOrgId = null;
+
         document.addEventListener('DOMContentLoaded', async function() {
             // Auth guard - require client roles
             const profile = await AuthGuard.init({
@@ -166,6 +214,8 @@
             });
 
             if (!profile) return;
+
+            currentOrgId = profile.org_id;
 
             // Update UI with user info
             AuthGuard.updateUserInfo(profile);
@@ -180,11 +230,18 @@
                 });
             }
 
-            // Load stats
+            // Load data
             loadStats();
-
-            // Load recent tickets
             loadRecentTickets();
+            loadUsageBanner();
+
+            // Buy tasks modal wiring
+            document.getElementById('close-buy-modal').addEventListener('click', closeBuyModal);
+            document.getElementById('cancel-buy-modal').addEventListener('click', closeBuyModal);
+            document.getElementById('confirm-buy-tasks').addEventListener('click', startCheckout);
+            document.getElementById('buy-tasks-modal').addEventListener('click', function(e) {
+                if (e.target === this) closeBuyModal();
+            });
         });
 
         async function loadStats() {
@@ -222,6 +279,110 @@
             container.innerHTML = result.tickets
                 .map(ticket => UIComponents.createTicketListItem(ticket))
                 .join('');
+        }
+
+        async function loadUsageBanner() {
+            if (!currentOrgId) return;
+
+            const result = await TicketsService.getMonthlyUsage(currentOrgId);
+            if (!result.success) return;
+
+            const { remaining, limit, used, extra_tasks } = result.usage;
+            const totalAvailable = remaining + (extra_tasks || 0);
+
+            const banner = document.getElementById('usage-banner');
+            const bannerInner = document.getElementById('usage-banner-inner');
+
+            if (totalAvailable > 2) return; // No banner needed
+
+            if (totalAvailable === 0) {
+                // No tasks at all
+                bannerInner.innerHTML = `
+                    <div class="usage-banner-content usage-banner-critical">
+                        <div class="usage-banner-text">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="8" x2="12" y2="12"/>
+                                <line x1="12" y1="16" x2="12.01" y2="16"/>
+                            </svg>
+                            <span>You have <strong>no tasks remaining</strong> this month. Purchase extra tasks to keep submitting requests.</span>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="openBuyModal()">Buy Tasks</button>
+                    </div>
+                `;
+            } else {
+                // Low tasks (1 or 2)
+                bannerInner.innerHTML = `
+                    <div class="usage-banner-content usage-banner-warning">
+                        <div class="usage-banner-text">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                <line x1="12" y1="9" x2="12" y2="13"/>
+                                <line x1="12" y1="17" x2="12.01" y2="17"/>
+                            </svg>
+                            <span>Only <strong>${totalAvailable} task${totalAvailable === 1 ? '' : 's'} remaining</strong> this month. Stock up before you run out.</span>
+                        </div>
+                        <button class="btn btn-secondary btn-sm" onclick="openBuyModal()">Buy More</button>
+                    </div>
+                `;
+            }
+
+            banner.style.display = 'block';
+        }
+
+        function openBuyModal() {
+            document.getElementById('buy-tasks-error').style.display = 'none';
+            document.getElementById('task-quantity').value = '10';
+            document.getElementById('buy-tasks-modal').style.display = 'flex';
+        }
+
+        function closeBuyModal() {
+            document.getElementById('buy-tasks-modal').style.display = 'none';
+        }
+
+        async function startCheckout() {
+            const btn = document.getElementById('confirm-buy-tasks');
+            const errorEl = document.getElementById('buy-tasks-error');
+            const quantity = parseInt(document.getElementById('task-quantity').value, 10);
+
+            errorEl.style.display = 'none';
+
+            if (!quantity || quantity < 1 || quantity > 500) {
+                errorEl.textContent = 'Please enter a quantity between 1 and 500.';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Redirecting...';
+
+            try {
+                const client = AudazSupabase.getClient();
+                const session = await AudazSupabase.getCurrentSession();
+
+                const { data, error } = await client.functions.invoke('create-checkout-session', {
+                    body: { quantity },
+                    headers: { Authorization: `Bearer ${session.access_token}` }
+                });
+
+                if (error || !data?.success) {
+                    throw new Error(data?.error || error?.message || 'Failed to start checkout');
+                }
+
+                window.location.href = data.url;
+            } catch (err) {
+                console.error('Checkout error:', err);
+                errorEl.textContent = err.message || 'Something went wrong. Please try again.';
+                errorEl.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                        <line x1="1" y1="10" x2="23" y2="10"/>
+                    </svg>
+                    Proceed to Checkout
+                `;
+            }
         }
     </script>
 </body>
