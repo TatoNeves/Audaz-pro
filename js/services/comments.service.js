@@ -40,6 +40,67 @@ const CommentsService = {
     },
 
     // ============================================
+    // Update Comment
+    // ============================================
+    async update(commentId, body) {
+        const client = AudazSupabase.getClient();
+        if (!client) {
+            return { success: false, error: 'Supabase not configured' };
+        }
+
+        try {
+            const { data, error } = await client.rpc('update_ticket_comment', {
+                p_comment_id: commentId,
+                p_body: body
+            });
+
+            if (error) {
+                console.error('Update comment error:', error);
+                return { success: false, error: 'Error updating comment' };
+            }
+
+            if (!data.success) {
+                return { success: false, error: data.error || 'Error updating comment' };
+            }
+
+            return { success: true };
+        } catch (err) {
+            console.error('Update comment error:', err);
+            return { success: false, error: 'Unexpected error' };
+        }
+    },
+
+    // ============================================
+    // Delete Comment
+    // ============================================
+    async delete(commentId) {
+        const client = AudazSupabase.getClient();
+        if (!client) {
+            return { success: false, error: 'Supabase not configured' };
+        }
+
+        try {
+            const { data, error } = await client.rpc('delete_ticket_comment', {
+                p_comment_id: commentId
+            });
+
+            if (error) {
+                console.error('Delete comment error:', error);
+                return { success: false, error: 'Error deleting comment' };
+            }
+
+            if (!data.success) {
+                return { success: false, error: data.error || 'Error deleting comment' };
+            }
+
+            return { success: true };
+        } catch (err) {
+            console.error('Delete comment error:', err);
+            return { success: false, error: 'Unexpected error' };
+        }
+    },
+
+    // ============================================
     // Get Comments for Ticket
     // ============================================
     async getByTicketId(ticketId) {

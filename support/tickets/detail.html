@@ -515,10 +515,74 @@
             }
 
             container.innerHTML = result.comments
-                .map(comment => UIComponents.createCommentItem(comment, {
-                    context: { mentionableUsers }
-                }))
+                .map(comment => {
+                    const canManage = canManageComment(comment);
+                    return UIComponents.createCommentItem(comment, {
+                        context: { mentionableUsers },
+                        canEdit: canManage,
+                        canDelete: canManage
+                    });
+                })
                 .join('');
+
+            setupCommentActions(result.comments);
+        }
+
+        function canManageComment(comment) {
+            if (!currentProfile || !comment) return false;
+            return comment.author_id === currentProfile.id || currentProfile.role?.startsWith('support');
+        }
+
+        function setupCommentActions(comments) {
+            const commentsById = new Map((comments || []).map(comment => [comment.id, comment]));
+
+            document.querySelectorAll('.comment-edit-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const commentId = e.currentTarget.dataset.commentId;
+                    const comment = commentsById.get(commentId);
+                    if (!comment || !canManageComment(comment)) return;
+
+                    const updatedBody = prompt('Edit comment:', comment.body || '');
+                    if (updatedBody === null) return;
+
+                    const trimmedBody = updatedBody.trim();
+                    if (!trimmedBody) {
+                        UIComponents.showError('Comment cannot be empty');
+                        return;
+                    }
+
+                    if (trimmedBody === (comment.body || '').trim()) return;
+
+                    const result = await CommentsService.update(commentId, trimmedBody);
+                    if (result.success) {
+                        UIComponents.showSuccess('Comment updated');
+                        await loadComments(currentTicket.id);
+                    } else {
+                        UIComponents.showError(result.error);
+                    }
+                });
+            });
+
+            document.querySelectorAll('.comment-delete-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const commentId = e.currentTarget.dataset.commentId;
+                    const comment = commentsById.get(commentId);
+                    if (!comment || !canManageComment(comment)) return;
+
+                    if (!confirm('Delete this comment? This action cannot be undone.')) {
+                        return;
+                    }
+
+                    const result = await CommentsService.delete(commentId);
+                    if (result.success) {
+                        UIComponents.showSuccess('Comment deleted');
+                        await loadComments(currentTicket.id);
+                        await loadTimeline(currentTicket.id);
+                    } else {
+                        UIComponents.showError(result.error);
+                    }
+                });
+            });
         }
 
         let allTimelineEvents = [];

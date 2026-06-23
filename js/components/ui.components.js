@@ -279,6 +279,15 @@ const UIComponents = {
         const parsed = this.parseCommentBody(comment.body || '', mentionableUsers);
         const isSupport = comment.author?.role?.startsWith('support');
         const roleLabel = isSupport ? 'Support' : 'Client';
+        const canEdit = Boolean(options.canEdit);
+        const canDelete = Boolean(options.canDelete);
+        const editedLabel = comment.edited_at ? `<span class="comment-edited">edited</span>` : '';
+        const actionsHtml = (canEdit || canDelete) ? `
+            <div class="comment-actions">
+                ${canEdit ? `<button type="button" class="comment-action-btn comment-edit-btn" data-comment-id="${this.escapeHtml(comment.id)}">Edit</button>` : ''}
+                ${canDelete ? `<button type="button" class="comment-action-btn comment-delete-btn" data-comment-id="${this.escapeHtml(comment.id)}">Delete</button>` : ''}
+            </div>
+        ` : '';
 
         // Separate images from other attachments
         const imageAttachments = parsed.attachments.filter(att => att.isImage && att.url);
@@ -325,6 +334,8 @@ const UIComponents = {
                         <span class="comment-author">${this.escapeHtml(comment.author?.full_name || 'Unknown')}</span>
                         <span class="comment-role">${roleLabel}</span>
                         <span class="comment-date">${this.formatDate(comment.created_at)}</span>
+                        ${editedLabel}
+                        ${actionsHtml}
                     </div>
                     ${parsed.bodyHtml ? `<div class="comment-body">${parsed.bodyHtml}</div>` : ''}
                     ${imagesHtml}
