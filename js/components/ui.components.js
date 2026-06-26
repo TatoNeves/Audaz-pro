@@ -112,6 +112,7 @@ const UIComponents = {
         const statusMap = {
             'open': { label: 'Open', class: 'status-open' },
             'in_progress': { label: 'In Progress', class: 'status-progress' },
+            'client_review': { label: 'Under Client Review', class: 'status-client-review' },
             'done': { label: 'Done', class: 'status-done' },
             'cancelled': { label: 'Cancelled', class: 'status-cancelled' }
         };

@@ -260,7 +260,9 @@ const CommentsService = {
         const translations = {
             'open': 'Open',
             'in_progress': 'In Progress',
-            'done': 'Done'
+            'client_review': 'Under Client Review',
+            'done': 'Done',
+            'cancelled': 'Cancelled'
         };
         return translations[status] || status;
     },

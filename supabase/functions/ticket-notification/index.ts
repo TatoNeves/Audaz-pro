@@ -37,7 +37,9 @@ interface NotificationRequest {
 const statusLabels: Record<string, string> = {
   open: "Open",
   in_progress: "In Progress",
+  client_review: "Under Client Review",
   done: "Done",
+  cancelled: "Cancelled",
 };
 
 const priorityLabels: Record<string, string> = {

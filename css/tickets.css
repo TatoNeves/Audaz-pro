@@ -677,6 +677,11 @@
     color: #f59e0b;
 }
 
+.status-client-review {
+    background: rgba(20, 184, 166, 0.15);
+    color: #14b8a6;
+}
+
 .status-done {
     background: rgba(34, 197, 94, 0.15);
     color: #22c55e;
