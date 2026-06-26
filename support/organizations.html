@@ -141,13 +141,21 @@
                         <small class="form-hint">Maximum number of tickets this organization can create per month</small>
                     </div>
 
+                    <div class="form-group">
+                        <label for="edit-default-assignee">Default Technician</label>
+                        <select id="edit-default-assignee">
+                            <option value="">No automatic assignment</option>
+                        </select>
+                        <small class="form-hint">New tickets from this organization will be assigned to this support user automatically.</small>
+                    </div>
+
                     <div class="form-info-box">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
                             <circle cx="12" cy="12" r="10"/>
                             <line x1="12" y1="16" x2="12" y2="12"/>
                             <line x1="12" y1="8" x2="12.01" y2="8"/>
                         </svg>
-                        <p>Changes take effect immediately. The organization will be able to create tickets up to the new limit.</p>
+                        <p>Changes take effect immediately. New tickets will use the selected technician.</p>
                     </div>
                 </form>
             </div>
@@ -303,6 +311,7 @@
     <script src="../js/components/auth-guard.js"></script>
     <script>
         let organizations = [];
+        let supportAgents = [];
         let currentProfile = null;
 
         document.addEventListener('DOMContentLoaded', async function() {
@@ -341,7 +350,7 @@
             // Setup new org button
             document.getElementById('btn-new-org').addEventListener('click', openCreateModal);
 
-            // Load organizations
+            await loadSupportAgents();
             loadOrganizations();
         });
 
@@ -383,6 +392,26 @@
                 console.error('Load organizations error:', err);
                 container.innerHTML = '<p class="error-message">Error loading organizations</p>';
             }
+        }
+
+        async function loadSupportAgents() {
+            const result = await TicketsService.getSupportAgents();
+            supportAgents = result.success ? (result.agents || []) : [];
+            populateDefaultAssigneeSelect();
+        }
+
+        function populateDefaultAssigneeSelect(selectedId = '') {
+            const select = document.getElementById('edit-default-assignee');
+            if (!select) return;
+
+            select.innerHTML = `
+                <option value="">No automatic assignment</option>
+                ${supportAgents.map(agent => `
+                    <option value="${agent.id}">${escapeHtml(agent.full_name)}</option>
+                `).join('')}
+            `;
+
+            select.value = selectedId || '';
         }
 
         function renderOrganizations() {
@@ -505,6 +534,10 @@
                             <span class="org-stat-value">${org.monthly_limit}</span>
                             <span class="org-stat-label">Monthly Limit</span>
                         </div>
+                        <div class="org-stat">
+                            <span class="org-stat-value">${org.default_assignee_name ? escapeHtml(org.default_assignee_name) : 'None'}</span>
+                            <span class="org-stat-label">Default Technician</span>
+                        </div>
                     </div>
 
                     <div class="org-usage">
@@ -542,6 +575,7 @@
             document.getElementById('modal-org-stats').textContent = `${org.member_count} members • ${org.total_tickets} total tickets`;
             document.getElementById('edit-plan-name').value = org.plan_name;
             document.getElementById('edit-monthly-limit').value = org.monthly_limit;
+            populateDefaultAssigneeSelect(org.default_assignee_id || '');
             document.getElementById('edit-modal').style.display = 'flex';
         }
 
@@ -556,6 +590,7 @@
             const orgId = document.getElementById('edit-org-id').value;
             const planName = document.getElementById('edit-plan-name').value;
             const monthlyLimit = parseInt(document.getElementById('edit-monthly-limit').value, 10);
+            const defaultAssigneeId = document.getElementById('edit-default-assignee').value || null;
 
             if (monthlyLimit < 0) {
                 UIComponents.showError('Monthly limit must be non-negative');
@@ -587,6 +622,24 @@
 
                 if (!data.success) {
                     UIComponents.showError(data.error || 'Error updating organization');
+                    UIComponents.setButtonLoading(btn, false);
+                    return;
+                }
+
+                const assigneeResult = await client.rpc('update_org_default_assignee', {
+                    p_org_id: orgId,
+                    p_assignee_id: defaultAssigneeId
+                });
+
+                if (assigneeResult.error) {
+                    console.error('Update default assignee error:', assigneeResult.error);
+                    UIComponents.showError('Organization limits saved, but technician assignment failed');
+                    UIComponents.setButtonLoading(btn, false);
+                    return;
+                }
+
+                if (!assigneeResult.data.success) {
+                    UIComponents.showError(assigneeResult.data.error || 'Error updating default technician');
                     UIComponents.setButtonLoading(btn, false);
                     return;
                 }
