@@ -210,7 +210,7 @@ const AuthService = {
                 .from('profiles')
                 .select(`
                     *,
-                    organization:organizations(*)
+                    organization:organizations!profiles_org_id_fkey(*)
                 `)
                 .eq('id', user.id)
                 .single();
