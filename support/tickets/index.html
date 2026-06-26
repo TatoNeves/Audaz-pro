@@ -166,6 +166,16 @@
             return deadline;
         }
 
+        function parseDateOnly(dateValue) {
+            if (!dateValue) return null;
+            const date = new Date(`${dateValue}T12:00:00`);
+            return Number.isNaN(date.getTime()) ? null : date;
+        }
+
+        function getTicketDeadline(ticket) {
+            return parseDateOnly(ticket?.due_date) || calculateDeadline(ticket.created_at, ticket.priority);
+        }
+
         function formatDeadlineDate(date) {
             const options = { month: 'short', day: 'numeric' };
             return date.toLocaleDateString('en-US', options);
@@ -189,7 +199,7 @@
 
         function sortTicketsByDeadline(tickets) {
             return tickets.map(ticket => {
-                const deadline = calculateDeadline(ticket.created_at, ticket.priority);
+                const deadline = getTicketDeadline(ticket);
                 const deadlineStatus = getDeadlineStatus(deadline);
                 return {
                     ...ticket,

@@ -242,6 +242,9 @@ const CommentsService = {
             case 'request_units_changed':
                 return `${actorName} changed the request count from ${data.from} to ${data.to}`;
 
+            case 'due_date_changed':
+                return `${actorName} changed the due date from "${this.formatEventDate(data.from)}" to "${this.formatEventDate(data.to)}"`;
+
             case 'commented':
                 return `${actorName} added a comment`;
 
@@ -270,6 +273,18 @@ const CommentsService = {
             'urgente': 'Urgent'
         };
         return translations[priority] || priority;
+    },
+
+    formatEventDate(dateValue) {
+        if (!dateValue) return 'automatic';
+        const date = new Date(`${dateValue}T12:00:00`);
+        if (Number.isNaN(date.getTime())) return dateValue;
+
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
     }
 };
 

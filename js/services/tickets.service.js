@@ -302,6 +302,43 @@ const TicketsService = {
     },
 
     // ============================================
+    // Update Ticket Due Date (Support)
+    // ============================================
+    async updateDueDate(ticketId, dueDate, reason = null) {
+        const client = AudazSupabase.getClient();
+        if (!client) {
+            return { success: false, error: 'Supabase not configured' };
+        }
+
+        try {
+            const { data, error } = await client.rpc('update_ticket_due_date', {
+                p_ticket_id: ticketId,
+                p_due_date: dueDate || null,
+                p_reason: reason || null
+            });
+
+            if (error) {
+                console.error('Update due date error:', error);
+                return { success: false, error: 'Error updating due date' };
+            }
+
+            if (!data.success) {
+                return { success: false, error: data.error || 'Error updating due date' };
+            }
+
+            return {
+                success: true,
+                oldDueDate: data.old_due_date,
+                newDueDate: data.new_due_date,
+                changed: data.changed
+            };
+        } catch (err) {
+            console.error('Update due date error:', err);
+            return { success: false, error: 'Unexpected error' };
+        }
+    },
+
+    // ============================================
     // Get Support Agents (for assignment dropdown)
     // ============================================
     async getSupportAgents() {

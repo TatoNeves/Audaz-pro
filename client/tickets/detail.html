@@ -249,6 +249,16 @@
             return deadline;
         }
 
+        function parseDateOnly(dateValue) {
+            if (!dateValue) return null;
+            const date = new Date(`${dateValue}T12:00:00`);
+            return Number.isNaN(date.getTime()) ? null : date;
+        }
+
+        function getTicketDeadline(ticket) {
+            return parseDateOnly(ticket?.due_date) || calculateDeadline(ticket.created_at, ticket.priority);
+        }
+
         function formatDeadlineDate(date) {
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
             return date.toLocaleDateString('en-US', options);
@@ -327,7 +337,7 @@
             document.getElementById('ticket-title').textContent = currentTicket.title;
 
             // Calculate deadline
-            const deadline = calculateDeadline(currentTicket.created_at, currentTicket.priority);
+            const deadline = getTicketDeadline(currentTicket);
             const deadlineStatus = getDeadlineStatus(deadline);
             const isCompleted = currentTicket.status === 'done';
             updateCommentComposerState(!isCompleted);

@@ -150,6 +150,12 @@
                                 <small class="form-hint">How many monthly request units this ticket consumes.</small>
                                 <button type="button" id="request-units-btn" class="btn btn-primary btn-small">Update Count</button>
                             </div>
+                            <div class="action-group">
+                                <label for="due-date-input">Due Date</label>
+                                <input type="date" id="due-date-input">
+                                <small class="form-hint">Set a manual due date. Leave blank to use the priority default.</small>
+                                <button type="button" id="due-date-btn" class="btn btn-primary btn-small">Update Date</button>
+                            </div>
                         </div>
 
                         <!-- Collaborators Card -->
@@ -241,6 +247,25 @@
             const deadline = new Date(created);
             deadline.setDate(deadline.getDate() + days);
             return deadline;
+        }
+
+        function parseDateOnly(dateValue) {
+            if (!dateValue) return null;
+            const date = new Date(`${dateValue}T12:00:00`);
+            return Number.isNaN(date.getTime()) ? null : date;
+        }
+
+        function getTicketDeadline(ticket) {
+            return parseDateOnly(ticket?.due_date) || calculateDeadline(ticket.created_at, ticket.priority);
+        }
+
+        function formatDateInputValue(dateValue) {
+            const date = parseDateOnly(dateValue);
+            if (!date) return '';
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
         }
 
         function formatDeadlineDate(date) {
@@ -352,6 +377,11 @@
                 requestUnitsInput.value = currentTicket.request_units || 1;
             }
 
+            const dueDateInput = document.getElementById('due-date-input');
+            if (dueDateInput) {
+                dueDateInput.value = formatDateInputValue(currentTicket.due_date);
+            }
+
             // Render ticket info
             const infoContainer = document.getElementById('ticket-info');
             infoContainer.innerHTML = `
@@ -374,7 +404,7 @@
             `;
 
             // Calculate deadline
-            const deadline = calculateDeadline(currentTicket.created_at, currentTicket.priority);
+            const deadline = getTicketDeadline(currentTicket);
             const deadlineStatus = getDeadlineStatus(deadline);
             const isCompleted = currentTicket.status === 'done';
             updateCommentComposerState(!isCompleted);
@@ -387,6 +417,7 @@
                         <span class="field-label">Deadline:</span>
                         <span class="expected-completion-date">${formatDeadlineDate(deadline)}</span>
                         <span class="expected-completion-status deadline-badge ${deadlineStatus.status}">${deadlineStatus.status === 'overdue' ? '⚠️ ' : ''}${deadlineStatus.daysText}</span>
+                        ${currentTicket.due_date ? '<span class="field-value muted">Manual date</span>' : ''}
                     </div>
                 ` : ''}
                 <div class="info-field">
@@ -757,6 +788,38 @@
                 }
 
                 UIComponents.setButtonLoading(btn, false, 'Update Count');
+            });
+
+            // Update due date
+            document.getElementById('due-date-btn').addEventListener('click', async () => {
+                const btn = document.getElementById('due-date-btn');
+                const input = document.getElementById('due-date-input');
+                const dueDate = input.value || null;
+                const currentDueDate = currentTicket.due_date || null;
+
+                if (dueDate === currentDueDate) {
+                    UIComponents.showWarning(dueDate ? 'This ticket already has that due date' : 'This ticket is already using the automatic due date');
+                    return;
+                }
+
+                const reason = prompt('Reason for changing the due date:', '');
+                if (reason === null) {
+                    return;
+                }
+
+                UIComponents.setButtonLoading(btn, true);
+
+                const result = await TicketsService.updateDueDate(currentTicket.id, dueDate, reason.trim());
+
+                if (result.success) {
+                    UIComponents.showSuccess('Due date updated');
+                    await loadTicket(currentTicket.id);
+                    await loadTimeline(currentTicket.id);
+                } else {
+                    UIComponents.showError(result.error);
+                }
+
+                UIComponents.setButtonLoading(btn, false, 'Update Date');
             });
         }
 
