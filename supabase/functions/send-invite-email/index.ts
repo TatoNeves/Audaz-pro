@@ -32,7 +32,14 @@ serve(async (req) => {
       );
     }
 
-    const roleDisplay = role === "client_admin" ? "Administrator" : "User";
+    const roleDisplay = role === "client_admin"
+      ? "Administrator"
+      : role === "support_agent"
+        ? "Support Technician"
+        : "User";
+    const inviteDescription = role === "support_agent"
+      ? `You have received an invitation to join the Audaz Pro support team as the technician assigned to <strong style="color: #333333;">${orgName}</strong>.`
+      : `You have received an invitation to join the organization <strong style="color: #333333;">${orgName}</strong> on Audaz Pro.`;
     const expiresDate = new Date(expiresAt).toLocaleDateString("en-US", {
       day: "2-digit",
       month: "long",
@@ -110,7 +117,7 @@ serve(async (req) => {
               <h2 style="color: #333333; margin: 0 0 20px; font-size: 24px;">You've been invited!</h2>
 
               <p style="color: #666666; font-size: 16px; line-height: 1.6; margin: 0 0 20px;">
-                You have received an invitation to join the organization <strong style="color: #333333;">${orgName}</strong> on Audaz Pro.
+                ${inviteDescription}
               </p>
 
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f8f9fa; border-radius: 8px; margin: 20px 0;">
@@ -178,7 +185,9 @@ serve(async (req) => {
       body: JSON.stringify({
         from: "Audaz Pro <noreply@audazpro.ca>",
         to: [to],
-        subject: `Invitation to ${orgName} - Audaz Pro`,
+        subject: role === "support_agent"
+          ? `Support invitation for ${orgName} - Audaz Pro`
+          : `Invitation to ${orgName} - Audaz Pro`,
         html: html,
       }),
     });

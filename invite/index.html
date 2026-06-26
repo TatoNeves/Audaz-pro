@@ -162,6 +162,7 @@
     <script>
         let invitationToken = null;
         let invitationData = null;
+        let postAcceptLoginUrl = '/client/index.html';
 
         document.addEventListener('DOMContentLoaded', async function() {
             // Get token from URL
@@ -191,9 +192,14 @@
             }
 
             invitationData = result.invitation;
+            postAcceptLoginUrl = invitationData.role === 'support_agent'
+                ? '/support/index.html'
+                : '/client/index.html';
 
             // Show accept form
-            document.getElementById('invite-org-name').textContent = invitationData.orgName;
+            document.getElementById('invite-org-name').textContent = invitationData.role === 'support_agent'
+                ? `Audaz Pro Support for ${invitationData.orgName}`
+                : invitationData.orgName;
             document.getElementById('accept-email').value = invitationData.email;
             showPanel('accept');
 
@@ -229,11 +235,14 @@
             if (result.success) {
                 if (result.needsEmailConfirmation) {
                     document.getElementById('confirm-email').textContent = email;
+                    document.querySelector('#confirm-panel .auth-footer a').href = postAcceptLoginUrl;
                     showPanel('confirm');
                 } else {
                     showPanel('success');
                     setTimeout(() => {
-                        window.location.href = '/client/dashboard.html';
+                        window.location.href = result.role === 'support_agent'
+                            ? '/support/dashboard.html'
+                            : '/client/dashboard.html';
                     }, 2000);
                 }
             } else {
