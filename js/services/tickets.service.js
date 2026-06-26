@@ -265,6 +265,43 @@ const TicketsService = {
     },
 
     // ============================================
+    // Update Ticket Request Units (Support)
+    // ============================================
+    async updateRequestUnits(ticketId, requestUnits, reason = null) {
+        const client = AudazSupabase.getClient();
+        if (!client) {
+            return { success: false, error: 'Supabase not configured' };
+        }
+
+        try {
+            const { data, error } = await client.rpc('update_ticket_request_units', {
+                p_ticket_id: ticketId,
+                p_request_units: requestUnits,
+                p_reason: reason || null
+            });
+
+            if (error) {
+                console.error('Update request units error:', error);
+                return { success: false, error: 'Error updating request count' };
+            }
+
+            if (!data.success) {
+                return { success: false, error: data.error || 'Error updating request count' };
+            }
+
+            return {
+                success: true,
+                oldUnits: data.old_units,
+                newUnits: data.new_units,
+                delta: data.delta
+            };
+        } catch (err) {
+            console.error('Update request units error:', err);
+            return { success: false, error: 'Unexpected error' };
+        }
+    },
+
+    // ============================================
     // Get Support Agents (for assignment dropdown)
     // ============================================
     async getSupportAgents() {

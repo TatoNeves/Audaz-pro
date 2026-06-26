@@ -144,6 +144,12 @@
                                 </select>
                                 <button type="button" id="assign-btn" class="btn btn-primary btn-small">Assign</button>
                             </div>
+                            <div class="action-group">
+                                <label for="request-units-input">Request Count</label>
+                                <input type="number" id="request-units-input" min="1" max="1000" step="1" value="1">
+                                <small class="form-hint">How many monthly request units this ticket consumes.</small>
+                                <button type="button" id="request-units-btn" class="btn btn-primary btn-small">Update Count</button>
+                            </div>
                         </div>
 
                         <!-- Collaborators Card -->
@@ -341,6 +347,11 @@
                 document.getElementById('assign-select').value = currentTicket.assigned_to;
             }
 
+            const requestUnitsInput = document.getElementById('request-units-input');
+            if (requestUnitsInput) {
+                requestUnitsInput.value = currentTicket.request_units || 1;
+            }
+
             // Render ticket info
             const infoContainer = document.getElementById('ticket-info');
             infoContainer.innerHTML = `
@@ -389,6 +400,10 @@
                 <div class="info-field">
                     <span class="field-label">Created on:</span>
                     <span class="field-value">${UIComponents.formatDate(currentTicket.created_at, { relative: false })}</span>
+                </div>
+                <div class="info-field">
+                    <span class="field-label">Request count:</span>
+                    <span class="field-value">${currentTicket.request_units || 1}</span>
                 </div>
                 <div class="info-field">
                     <span class="field-label">Assignee:</span>
@@ -705,6 +720,43 @@
                 }
 
                 UIComponents.setButtonLoading(btn, false);
+            });
+
+            // Update request units
+            document.getElementById('request-units-btn').addEventListener('click', async () => {
+                const btn = document.getElementById('request-units-btn');
+                const input = document.getElementById('request-units-input');
+                const requestUnits = parseInt(input.value, 10);
+                const currentUnits = currentTicket.request_units || 1;
+
+                if (!Number.isInteger(requestUnits) || requestUnits < 1 || requestUnits > 1000) {
+                    UIComponents.showWarning('Request count must be between 1 and 1000');
+                    return;
+                }
+
+                if (requestUnits === currentUnits) {
+                    UIComponents.showWarning('This ticket already has that request count');
+                    return;
+                }
+
+                const reason = prompt('Reason for changing the request count:', '');
+                if (reason === null) {
+                    return;
+                }
+
+                UIComponents.setButtonLoading(btn, true);
+
+                const result = await TicketsService.updateRequestUnits(currentTicket.id, requestUnits, reason.trim());
+
+                if (result.success) {
+                    UIComponents.showSuccess('Request count updated');
+                    await loadTicket(currentTicket.id);
+                    await loadTimeline(currentTicket.id);
+                } else {
+                    UIComponents.showError(result.error);
+                }
+
+                UIComponents.setButtonLoading(btn, false, 'Update Count');
             });
         }
 

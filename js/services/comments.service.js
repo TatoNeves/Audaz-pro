@@ -239,6 +239,9 @@ const CommentsService = {
                 const toPriority = this.translatePriority(data.to);
                 return `${actorName} changed the priority from "${fromPriority}" to "${toPriority}"`;
 
+            case 'request_units_changed':
+                return `${actorName} changed the request count from ${data.from} to ${data.to}`;
+
             case 'commented':
                 return `${actorName} added a comment`;
 
